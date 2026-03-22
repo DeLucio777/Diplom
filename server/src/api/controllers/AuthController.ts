@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import UserRepository from '../../repositories/UserRepository';
+import UserService from '../../services/UserService';
 
 class AuthController {
-    private userRepo: UserRepository;
+    private userService: UserService;
 
     constructor() {
-        this.userRepo = new UserRepository();
+        this.userService = new UserService();
     }
 
     async login(req: Request, res: Response): Promise<void> {
@@ -17,7 +17,7 @@ class AuthController {
                 return;
             }
             
-            const user = await this.userRepo.login(login, password);
+            const user = await this.userService.login(login, password);
             
             if (!user) {
                 res.status(401).json({ error: 'Invalid credentials' });

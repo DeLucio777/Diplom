@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
-import RoleRepository from '../../repositories/RoleRepository';
+import RoleService from '../../services/RoleService';
 
 class RoleController {
-    private roleRepo: RoleRepository;
+    private roleService: RoleService;
 
     constructor() {
-        this.roleRepo = new RoleRepository();
+        this.roleService = new RoleService();
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const roles = await this.roleRepo.getAll();
+            const roles = await this.roleService.getAll();
             res.json(roles);
         } catch (error) {
             console.error('Error fetching roles:', error);
@@ -21,7 +21,7 @@ class RoleController {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const role = await this.roleRepo.getById(id);
+            const role = await this.roleService.getById(id);
             if (!role) {
                 res.status(404).json({ error: 'Role not found' });
                 return;

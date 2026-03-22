@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
-import UserRepository from '../../repositories/UserRepository';
+import UserService from '../../services/UserService';
 
 class UserController {
-    private userRepo: UserRepository;
+    private userService: UserService;
 
     constructor() {
-        this.userRepo = new UserRepository();
+        this.userService = new UserService();
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const users = await this.userRepo.getAll();
+            const users = await this.userService.getAll();
             res.json(users);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -21,7 +21,7 @@ class UserController {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const user = await this.userRepo.getById(id);
+            const user = await this.userService.getById(id);
             if (!user) {
                 res.status(404).json({ error: 'User not found' });
                 return;

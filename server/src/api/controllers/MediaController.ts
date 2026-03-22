@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
-import MediaRepository from '../../repositories/MediaRepository';
+import MediaService from '../../services/MediaService';
 
 class MediaController {
-    private mediaRepo: MediaRepository;
+    private mediaService: MediaService;
 
     constructor() {
-        this.mediaRepo = new MediaRepository();
+        this.mediaService = new MediaService();
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const media = await this.mediaRepo.getAll();
+            const media = await this.mediaService.getAll();
             res.json(media);
         } catch (error) {
             console.error('Error fetching media:', error);
@@ -21,7 +21,7 @@ class MediaController {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const media = await this.mediaRepo.getById(id);
+            const media = await this.mediaService.getById(id);
             if (!media) {
                 res.status(404).json({ error: 'Media not found' });
                 return;

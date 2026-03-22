@@ -31,4 +31,7 @@ router.post('/', (req, res) => taskController.create(req, res));
 // POST /api/tasks/full - Create full task with all related data
 router.post('/full', (req, res) => taskController.createFull(req, res));
 
+// DELETE /api/tasks/:id - Delete task and all related items
+router.delete('/:id', (req, res) => taskController.delete(req, res));
+
 export default router;

@@ -157,6 +157,62 @@ export default class TaskItemsRepository {
         return result.recordset[0].Id;
     }
 
+    // ===== DELETE methods for cascade delete =====
+    async deleteConstructionsByTaskId(taskId: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        await pool.request()
+            .input('taskId', sql.Int, taskId)
+            .query('DELETE FROM tbl_TaskConstruction WHERE FK_TaskId = @taskId');
+        
+        return true;
+    }
+
+    async deleteFindOddItemsByTaskId(taskId: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        await pool.request()
+            .input('taskId', sql.Int, taskId)
+            .query('DELETE FROM tbl_FindOddOneOutItems WHERE FK_TaskId = @taskId');
+        
+        return true;
+    }
+
+    async deleteMatchPairsByTaskId(taskId: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        await pool.request()
+            .input('taskId', sql.Int, taskId)
+            .query('DELETE FROM tbl_MatchImageWordPairs WHERE FK_TaskId = @taskId');
+        
+        return true;
+    }
+
+    async deleteSequenceItemsByTaskId(taskId: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        await pool.request()
+            .input('taskId', sql.Int, taskId)
+            .query('DELETE FROM tbl_SequenceItems WHERE FK_TaskId = @taskId');
+        
+        return true;
+    }
+
+    async deleteSortItemsByTaskId(taskId: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        await pool.request()
+            .input('taskId', sql.Int, taskId)
+            .query('DELETE FROM tbl_SortItems WHERE FK_TaskId = @taskId');
+        
+        return true;
+    }
+
     // ===== Mappers =====
     private mapToConstruction(row: any): TaskConstruction {
         const c = new TaskConstruction();

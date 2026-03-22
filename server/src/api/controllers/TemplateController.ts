@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
-import TaskTemplateRepository from '../../repositories/TaskTemplateRepository';
+import TemplateService from '../../services/TemplateService';
 
 class TemplateController {
-    private templateRepo: TaskTemplateRepository;
+    private templateService: TemplateService;
 
     constructor() {
-        this.templateRepo = new TaskTemplateRepository();
+        this.templateService = new TemplateService();
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const templates = await this.templateRepo.getAll();
+            const templates = await this.templateService.getAll();
             res.json(templates);
         } catch (error) {
             console.error('Error fetching templates:', error);
@@ -21,7 +21,7 @@ class TemplateController {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const template = await this.templateRepo.getById(id);
+            const template = await this.templateService.getById(id);
             if (!template) {
                 res.status(404).json({ error: 'Template not found' });
                 return;
