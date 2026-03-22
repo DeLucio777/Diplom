@@ -1,33 +1,13 @@
-import { Router, Request, Response } from 'express';
-import TaskTemplateRepository from '../../repositories/TaskTemplateRepository';
+import { Router } from 'express';
+import TemplateController from '../controllers/TemplateController';
 
 const router = Router();
-const templateRepo = new TaskTemplateRepository();
+const templateController = new TemplateController();
 
 // GET /api/templates - Get all templates
-router.get('/', async (req: Request, res: Response) => {
-    try {
-        const templates = await templateRepo.getAll();
-        res.json(templates);
-    } catch (error) {
-        console.error('Error fetching templates:', error);
-        res.status(500).json({ error: 'Failed to fetch templates' });
-    }
-});
+router.get('/', (req, res) => templateController.getAll(req, res));
 
 // GET /api/templates/:id - Get template by ID
-router.get('/:id', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const template = await templateRepo.getById(id);
-        if (!template) {
-            return res.status(404).json({ error: 'Template not found' });
-        }
-        res.json(template);
-    } catch (error) {
-        console.error('Error fetching template:', error);
-        res.status(500).json({ error: 'Failed to fetch template' });
-    }
-});
+router.get('/:id', (req, res) => templateController.getById(req, res));
 
 export default router;

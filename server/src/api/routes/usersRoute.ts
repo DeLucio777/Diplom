@@ -1,33 +1,13 @@
-import { Router, Request, Response } from 'express';
-import UserRepository from '../../repositories/UserRepository';
+import { Router } from 'express';
+import UserController from '../controllers/UserController';
 
 const router = Router();
-const userRepo = new UserRepository();
+const userController = new UserController();
 
 // GET /api/users - Get all users
-router.get('/', async (req: Request, res: Response) => {
-    try {
-        const users = await userRepo.getAll();
-        res.json(users);
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ error: 'Failed to fetch users' });
-    }
-});
+router.get('/', (req, res) => userController.getAll(req, res));
 
 // GET /api/users/:id - Get user by ID
-router.get('/:id', async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        const user = await userRepo.getById(id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ error: 'Failed to fetch user' });
-    }
-});
+router.get('/:id', (req, res) => userController.getById(req, res));
 
 export default router;
