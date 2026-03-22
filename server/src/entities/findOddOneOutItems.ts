@@ -1,3 +1,6 @@
+import CatalogPECS from "./catalogPECS";
+import Task from "./task";
+
 export default class FindOddOneOutItem {
   PK_ItemId: number;           // INT NOT NULL IDENTITY(1,1) PRIMARY KEY
   FK_TaskId: number;           // INT NOT NULL (foreign key to Task)

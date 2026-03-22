@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/DeLucio777/Diplom/issues"
   },
-  "homepage": "https://github.com/DeLucio777/Diplom#readme"
+  "homepage": "https://github.com/DeLucio777/Diplom#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mssql": "^12.2.1"
+  },
+  "devDependencies": {
+    "@types/mssql": "^9.1.9"
+  }
 }

@@ -1,3 +1,7 @@
+import Task from "./task";
+import MediaCatalog from "./mediaCatalog";
+import CatalogPECS from "./catalogPECS";
+
 export default class MatchImageWordPair {
   PK_PairId: number;           // INT NOT NULL IDENTITY(1,1) PRIMARY KEY
   FK_TaskId: number;           // INT NOT NULL (foreign key to Task)

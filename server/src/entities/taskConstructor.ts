@@ -1,3 +1,5 @@
+import Task from "./task";
+
 export default class TaskConstruction {
   PK_ConstructionId: number;  // INT NOT NULL IDENTITY(1,1) PRIMARY KEY
   FK_TaskId: number;          // INT NOT NULL (foreign key to Task)
