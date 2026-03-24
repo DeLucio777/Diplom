@@ -4,7 +4,6 @@ import MediaCatalog from '../entities/mediaCatalog';
 
 export default class MediaRepository {
     
-    // GET all media items
     async getAll(): Promise<MediaCatalog[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -15,7 +14,6 @@ export default class MediaRepository {
         return result.recordset.map((row: any) => this.mapToMedia(row));
     }
 
-    // GET media by ID
     async getById(id: number): Promise<MediaCatalog | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -28,7 +26,6 @@ export default class MediaRepository {
         return this.mapToMedia(result.recordset[0]);
     }
 
-    // CREATE new media
     async create(media: MediaCatalog): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -46,7 +43,6 @@ export default class MediaRepository {
         return result.recordset[0].Id;
     }
 
-    // DELETE media
     async delete(id: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -58,7 +54,6 @@ export default class MediaRepository {
         return result.rowsAffected[0] > 0;
     }
 
-    // Helper method to map database row to MediaCatalog entity
     private mapToMedia(row: any): MediaCatalog {
         const media = new MediaCatalog();
         media.PK_MediaId = row.PK_MediaId;
