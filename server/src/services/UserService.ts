@@ -19,6 +19,10 @@ class UserService {
     async login(login: string, password: string): Promise<User | null> {
         return await this.userRepo.login(login, password);
     }
+
+    async findByLogin(login: string): Promise<User | null> {
+        return await this.userRepo.findByLogin(login);
+    }
 }
 
 export default UserService;

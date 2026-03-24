@@ -31,7 +31,7 @@ export async function connect(): Promise<sql.ConnectionPool> {
 
     try {
         pool = await sql.connect(config);
-        console.log('✅ Подключение к БД установлено');
+        console.log('Подключение к БД установлено');
         
         pool.on('error', (err) => {
             console.error('Ошибка пула подключений:', err);
@@ -39,7 +39,7 @@ export async function connect(): Promise<sql.ConnectionPool> {
         
         return pool;
     } catch (err) {
-        console.error('❌ Ошибка подключения к базе данных:', err);
+        console.error('Ошибка подключения к базе данных:', err);
         throw err;
     }
 }

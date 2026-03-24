@@ -141,14 +141,12 @@ class TaskService {
     }
 
     async delete(id: number): Promise<boolean> {
-        // First delete all related items
         await this.taskItemsRepo.deleteConstructionsByTaskId(id);
         await this.taskItemsRepo.deleteFindOddItemsByTaskId(id);
         await this.taskItemsRepo.deleteMatchPairsByTaskId(id);
         await this.taskItemsRepo.deleteSequenceItemsByTaskId(id);
         await this.taskItemsRepo.deleteSortItemsByTaskId(id);
         
-        // Then delete the task itself
         return await this.taskRepo.delete(id);
     }
 }

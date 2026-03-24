@@ -47,6 +47,29 @@ export default class UserRepository {
         return this.mapToUser(result.recordset[0]);
     }
 
+    // FIND BY LOGIN - Check if user exists by login (for existence check)
+    async findByLogin(login: string): Promise<User | null> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        const result = await pool.request()
+            .input('login', sql.VarChar(50), login)
+            .query(`
+                SELECT 
+                    u.PK_UserId,
+                    u.UserLogin,
+                    u.UserPassword,
+                    u.FK_RoleId,
+                    r.RoleName
+                FROM tbl_User u
+                LEFT JOIN tbl_Roles r ON u.FK_RoleId = r.PK_RoleId
+                WHERE u.UserLogin = @login
+            `);
+        
+        if (result.recordset.length === 0) return null;
+        return this.mapToUser(result.recordset[0]);
+    }
+
     // LOGIN - Find user by login and password
     async login(login: string, password: string): Promise<User | null> {
         const pool = getPool();

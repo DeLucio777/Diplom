@@ -9,6 +9,7 @@ class PecsController {
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
+        console.log('all pecs');
         try {
             const pecs = await this.pecsService.getAll();
             res.json(pecs);
@@ -19,6 +20,7 @@ class PecsController {
     }
 
     async getById(req: Request, res: Response): Promise<void> {
+        console.log('all pecs by id');
         try {
             const id = parseInt(req.params.id);
             const pecs = await this.pecsService.getById(id);

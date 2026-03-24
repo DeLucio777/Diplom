@@ -61,7 +61,6 @@ export default class TaskRepository {
     async create(task: Task): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
         const result = await pool.request()
             .input('title', sql.VarChar(50), task.Title)
             .input('description', sql.VarChar(50), task.Descripti)

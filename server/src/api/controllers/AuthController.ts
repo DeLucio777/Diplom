@@ -13,23 +13,21 @@ class AuthController {
             const { login, password } = req.body;
             
             if (!login || !password) {
-                res.status(400).json({ error: 'Login and password are required' });
+                res.sendStatus(401);
                 return;
             }
             
             const user = await this.userService.login(login, password);
             
             if (!user) {
-                res.status(401).json({ error: 'Invalid credentials' });
+                res.sendStatus(401);
                 return;
             }
             
-            // Don't return password in response
-            const { UserPassword, ...userWithoutPassword } = user as any;
-            res.json(userWithoutPassword);
+            res.json(user);
         } catch (error) {
             console.error('Error during login:', error);
-            res.status(500).json({ error: 'Login failed' });
+            res.sendStatus(401);
         }
     }
 }
