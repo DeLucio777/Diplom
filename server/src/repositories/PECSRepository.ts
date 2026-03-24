@@ -4,7 +4,6 @@ import CatalogPECS from '../entities/catalogPECS';
 
 export default class PECSRepository {
     
-    // GET all PECS items
     async getAll(): Promise<CatalogPECS[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -15,7 +14,6 @@ export default class PECSRepository {
         return result.recordset.map((row: any) => this.mapToPECS(row));
     }
 
-    // GET PECS by ID
     async getById(id: number): Promise<CatalogPECS | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -28,7 +26,6 @@ export default class PECSRepository {
         return this.mapToPECS(result.recordset[0]);
     }
 
-    // CREATE new PECS
     async create(pecs: CatalogPECS): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -39,14 +36,13 @@ export default class PECSRepository {
             .input('category', sql.VarChar(50), pecs.Category)
             .query(`
                 INSERT INTO tbl_CatalogPECS (Descripti, filePath, Category, UploadDate)
+                OUTPUT INSERTED.PK_PECSid
                 VALUES (@description, @filePath, @category, GETDATE());
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
-    // DELETE PECS
     async delete(id: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -58,7 +54,6 @@ export default class PECSRepository {
         return result.rowsAffected[0] > 0;
     }
 
-    // Helper method to map database row to CatalogPECS entity
     private mapToPECS(row: any): CatalogPECS {
         const pecs = new CatalogPECS();
         pecs.PK_PECSid = row.PK_PECSid;
