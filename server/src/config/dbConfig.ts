@@ -2,7 +2,7 @@ import sql from 'mssql';
 
 const config: sql.config = {
     server: 'localhost',
-    database: 'db_diplom',
+    database: 'db_MainDataBaseDiplom',
     options: {
         encrypt: true,
         trustServerCertificate: true,

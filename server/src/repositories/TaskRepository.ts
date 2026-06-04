@@ -10,8 +10,7 @@ export default class TaskRepository {
         
         const result = await pool.request()
             .query(`
-                SELECT * FROM vw_GetAllTasksWithDetails
-            `);
+                SELECT * FROM vw_GetAllTasksWithDetails`);
         
         return result.recordset.map((row: any) => this.mapToTask(row));
     }

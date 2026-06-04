@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<BUTTON onclick="fun()">fdfsfsdf</BUTTON>
+</body>
+<script>
+   async function fun() {
+       const resp = await fetch('http://localhost:3000/api/auth/login', {
+           method: 'POST',
+           headers: {
+               'Content-Type': 'application/json',
+           },
+           body: JSON.stringify({
+               login: '1',
+               password: '1',
+           }),
+       })
+           .then((response) => {
+               if (response.ok) {
+                   return response.json();
+               } else {
+                   throw new Error('Login failed');
+               }
+           })
+           .then((data) => console.log(data))
+           .catch((error) => console.error(error));
+       console.log(resp);
+
+   }
+</script>
+</html>

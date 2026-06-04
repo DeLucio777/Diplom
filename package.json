@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/DeLucio777/Diplom#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "mssql": "^12.2.1"
   },

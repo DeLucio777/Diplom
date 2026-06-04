@@ -6,9 +6,11 @@ import templatesRoute from './src/api/routes/templatesRoute';
 import pecsRoute from './src/api/routes/pecsRoute';
 import mediaRoute from './src/api/routes/mediaRoute';
 import authRoute from './src/api/routes/authRoute';
+import cors from 'cors';
 import { initDatabase } from './src/middlewares/dbConetxt';
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 
