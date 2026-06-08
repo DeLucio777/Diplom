@@ -30,11 +30,11 @@ export default class TaskItemsRepository {
             .input('paramValue', sql.VarChar(sql.MAX), construction.ParameterValue)
             .query(`
                 INSERT INTO tbl_TaskConstruction (FK_TaskId, ParameterName, ParameterValue)
+                OUTPUT INSERTED.PK_ConstructionId
                 VALUES (@taskId, @paramName, @paramValue);
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     // Find Odd One Out Items
@@ -60,11 +60,11 @@ export default class TaskItemsRepository {
             .input('pecsId', sql.Int, item.FK_pecsId)
             .query(`
                 INSERT INTO tbl_FindOddOneOutItems (FK_TaskId, ItemText, IsOddOne, FK_pecsId)
+                OUTPUT INSERTED.PK_ItemId
                 VALUES (@taskId, @itemText, @isOddOne, @pecsId);
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     //  Match Image Word Pairs 
@@ -90,11 +90,11 @@ export default class TaskItemsRepository {
             .input('words', sql.VarChar(255), pair.Words)
             .query(`
                 INSERT INTO tbl_MatchImageWordPairs (FK_TaskId, FK_MediaId, FK_pecsId, Words)
+                OUTPUT INSERTED.PK_PairId
                 VALUES (@taskId, @mediaId, @pecsId, @words);
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     // Sequence Items
@@ -120,11 +120,11 @@ export default class TaskItemsRepository {
             .input('pecsId', sql.Int, item.FK_pecsId)
             .query(`
                 INSERT INTO tbl_SequenceItems (FK_TaskId, ItemOrder, ItemValue, FK_pecsId)
+                OUTPUT INSERTED.PK_SeqItemId
                 VALUES (@taskId, @itemOrder, @itemValue, @pecsId);
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     // Sort Items
@@ -150,11 +150,11 @@ export default class TaskItemsRepository {
             .input('pecsId', sql.Int, item.FK_pecsId)
             .query(`
                 INSERT INTO tbl_SortItems (FK_TaskId, ItemValue, SortKey, FK_pecsId)
+                OUTPUT INSERTED.PK_SortItemId
                 VALUES (@taskId, @itemValue, @sortKey, @pecsId);
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     // DELETE methods for cascade delete 

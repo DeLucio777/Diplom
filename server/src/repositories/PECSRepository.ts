@@ -36,11 +36,11 @@ export default class PECSRepository {
             .input('category', sql.VarChar(50), pecs.Category)
             .query(`
                 INSERT INTO tbl_CatalogPECS (Descripti, filePath, Category, UploadDate)
+                OUTPUT INSERTED.PK_PECSid
                 VALUES (@description, @filePath, @category, GETDATE());
-                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     async delete(id: number): Promise<boolean> {

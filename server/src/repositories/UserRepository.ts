@@ -32,8 +32,8 @@ export default class UserRepository {
         
         const result = await pool.request()
             .input('login', sql.VarChar(50), login)
-            .query(`SELECT * FROM fun_GetUserByLogin(@login)
-            `);
+            .query(`SELECT * FROM fun_GetUserByLogin(@login)`);
+
         
         if (result.recordset.length === 0) return null;
         return this.mapToUser(result.recordset[0]);
@@ -47,6 +47,7 @@ export default class UserRepository {
             .input('login', sql.VarChar(50), login)
             .input('password', sql.VarChar(50), password)
             .query(`SELECT * FROM tbl_User WHERE UserLogin = @login and UserPassword = @password`);
+
         
         if (result.recordset.length === 0) return null;
         return this.mapToUser(result.recordset[0]);
@@ -60,13 +61,9 @@ export default class UserRepository {
             .input('login', sql.VarChar(50), user.UserLogin)
             .input('password', sql.VarChar(50), user.UserPassword)
             .input('roleId', sql.Int, user.FK_RoleId)
-            .query(`
-                INSERT INTO tbl_User (UserLogin, UserPassword, FK_RoleId)
-                VALUES (@login, @password, @roleId);
-                SELECT SCOPE_IDENTITY() as Id;
-            `);
+            .query(`exec fun_AuthUser @login,@password,@roleId`);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     private mapToUser(row: any): User {

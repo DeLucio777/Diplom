@@ -9,7 +9,7 @@ export default class MediaRepository {
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .query('SELECT PK_MediaId, FileType, FilePath, Descripti, UploadDate FROM tbl_MediaCatalog');
+            .query('SELECT * FROM vw_GetAllMedia');
         
         return result.recordset.map((row: any) => this.mapToMedia(row));
     }
@@ -20,7 +20,7 @@ export default class MediaRepository {
         
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query('SELECT PK_MediaId, FileType, FilePath, Descripti, UploadDate FROM tbl_MediaCatalog WHERE PK_MediaId = @id');
+            .query('SELECT * FROM fun_GetMediaId(@id)');
         
         if (result.recordset.length === 0) return null;
         return this.mapToMedia(result.recordset[0]);
@@ -31,16 +31,16 @@ export default class MediaRepository {
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .input('fileType', sql.VarChar(100), media.FileType)
-            .input('filePath', sql.VarChar(250), media.FilePath)
-            .input('description', sql.VarChar(50), media.Descripti)
+            .input('MfileType', sql.VarChar(100), media.FileType)
+            .input('MfilePath', sql.VarChar(250), media.FilePath)
+            .input('Mdescription', sql.VarChar(50), media.Descripti)
             .query(`
                 INSERT INTO tbl_MediaCatalog (FileType, FilePath, Descripti, UploadDate)
-                VALUES (@fileType, @filePath, @description, GETDATE());
-                SELECT SCOPE_IDENTITY() as Id;
+                OUTPUT INSERTED.PK_MediaId
+                VALUES (@MfileType, @MfilePath, @Mdescription, GETDATE());
             `);
         
-        return result.recordset[0].Id;
+        return result.recordset[0];
     }
 
     async delete(id: number): Promise<boolean> {
@@ -49,7 +49,7 @@ export default class MediaRepository {
         
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query('DELETE FROM tbl_MediaCatalog WHERE PK_MediaId = @id');
+            .query('exec pr_DeleteMedia @MediaId = @id');
         
         return result.rowsAffected[0] > 0;
     }

@@ -79,7 +79,6 @@ AS
 BEGIN
     INSERT INTO tbl_User (UserLogin, UserPassword, FK_RoleId)
     VALUES (@Login, @Password, @RoleId);
-    SELECT SCOPE_IDENTITY() AS UserId;
 END;
 GO
 
@@ -150,7 +149,6 @@ AS
 BEGIN
     INSERT INTO tbl_MediaCatalog (FileType, FilePath, Descripti, UploadDate)
     VALUES (@FileType, @FilePath, @Description, @UploadDate);
-    SELECT SCOPE_IDENTITY() AS MediaId;
 END;
 GO
 
@@ -234,7 +232,6 @@ AS
 BEGIN
     INSERT INTO tbl_CatalogPECS (Descripti, filePath, Category, UploadDate)
     VALUES (@Description, @FilePath, @Category, @UploadDate);
-    SELECT SCOPE_IDENTITY() AS PECSId;
 END;
 GO
 
@@ -304,7 +301,6 @@ AS
 BEGIN
     INSERT INTO tbl_TaskTemplate (TemplateName, Descripti)
     VALUES (@TemplateName, @Description);
-    SELECT SCOPE_IDENTITY() AS TemplateId;
 END;
 GO
 
@@ -391,7 +387,6 @@ AS
 BEGIN
     INSERT INTO tbl_Task (Title, Descripti, FK_TemplateId, FK_UserId, DifficultyLevel, UploadDate)
     VALUES (@Title, @Description, @TemplateId, @UserId, @DifficultyLevel, @UploadDate);
-    SELECT SCOPE_IDENTITY() AS TaskId;
 END;
 GO
 
@@ -462,7 +457,6 @@ AS
 BEGIN
     INSERT INTO tbl_TaskConstruction (FK_TaskId, ParameterName, ParameterValue)
     VALUES (@TaskId, @ParameterName, @ParameterValue);
-    SELECT SCOPE_IDENTITY() AS ConstructionId;
 END;
 GO
 
@@ -506,7 +500,6 @@ AS
 BEGIN
     INSERT INTO tbl_FindOddOneOutItems (FK_TaskId, ItemText, IsOddOne, FK_pecsId)
     VALUES (@TaskId, @ItemText, @IsOddOne, @PECSId);
-    SELECT SCOPE_IDENTITY() AS ItemId;
 END;
 GO
 
@@ -550,7 +543,6 @@ AS
 BEGIN
     INSERT INTO tbl_MatchImageWordPairs (FK_TaskId, FK_MediaId, FK_pecsId, Words)
     VALUES (@TaskId, @MediaId, @PECSId, @Words);
-    SELECT SCOPE_IDENTITY() AS PairId;
 END;
 GO
 
@@ -594,7 +586,6 @@ AS
 BEGIN
     INSERT INTO tbl_SequenceItems (FK_TaskId, ItemOrder, ItemValue, FK_pecsId)
     VALUES (@TaskId, @ItemOrder, @ItemValue, @PECSId);
-    SELECT SCOPE_IDENTITY() AS SeqItemId;
 END;
 GO
 
@@ -638,7 +629,6 @@ AS
 BEGIN
     INSERT INTO tbl_SortItems (FK_TaskId, ItemValue, SortKey, FK_pecsId)
     VALUES (@TaskId, @ItemValue, @SortKey, @PECSId);
-    SELECT SCOPE_IDENTITY() AS SortItemId;
 END;
 GO
 

@@ -42,7 +42,8 @@ export default class TaskRepository {
         
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query(` SELECT * FROM fun_GetTaskById(@id) `);
+            .query(`SELECT * FROM fun_GetTaskById(@id) `);
+
         
         if (result.recordset.length === 0) return null;
         return this.mapToTask(result.recordset[0]);
@@ -60,10 +61,9 @@ export default class TaskRepository {
             .query(`
                 INSERT INTO tbl_Task (Title, Descripti, FK_TemplateId, FK_UserId, DifficultyLevel, UploadDate)
                 VALUES (@title, @description, @templateId, @userId, @difficulty, GETDATE());
-                SELECT SCOPE_IDENTITY() as Id;
             `);
-        
-        return result.recordset[0].Id;
+        ////exec pr_CreateTask @title, @description, @templateId, @userId, @difficulty
+        return 1;
     }
 
     async update(id: number, task: Task): Promise<boolean> {
