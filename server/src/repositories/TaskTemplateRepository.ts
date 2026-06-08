@@ -9,8 +9,7 @@ export default class TaskTemplateRepository {
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .query('SELECT * FROM vw_GetAllTemplates');
-        
+            .query('SELECT PK_MediaId, FileType, FilePath, Descripti, UploadDate FROM tbl_MediaCatalog');        
         return result.recordset.map((row: any) => this.mapToTemplate(row));
     }
 

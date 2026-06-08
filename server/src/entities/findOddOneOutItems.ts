@@ -7,6 +7,7 @@ export default class FindOddOneOutItem {
   ItemText: string;            // varchar(255) NOT NULL
   IsOddOne: boolean;           // BIT NOT NULL
   FK_pecsId?: number;          // INT (foreign key to CatalogPECS)
+  Help?: string;               // varchar(255)
   Task?: Task;                 // optional navigation property
   PECS?: CatalogPECS;          // optional navigation property
 }

@@ -61,7 +61,11 @@ export default class UserRepository {
             .input('login', sql.VarChar(50), user.UserLogin)
             .input('password', sql.VarChar(50), user.UserPassword)
             .input('roleId', sql.Int, user.FK_RoleId)
-            .query(`exec fun_AuthUser @login,@password,@roleId`);
+            .query(`
+--                 INSERT INTO tbl_User (UserLogin, UserPassword, FK_RoleId)
+--                 VALUES (@login, @password, @roleId);
+--                 SELECT SCOPE_IDENTITY() as Id;
+            `);
         
         return result.recordset[0];
     }
