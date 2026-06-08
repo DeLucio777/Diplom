@@ -12,7 +12,7 @@ const config: sql.config = {
         type: 'default',
         options: {
             userName: 'DiplomUser',
-            password: '1231'
+            password: 'StrongPass123!'
         }
     },
     pool: {
