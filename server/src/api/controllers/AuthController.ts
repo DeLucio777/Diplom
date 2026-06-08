@@ -8,26 +8,26 @@ class AuthController {
         this.userService = new UserService();
     }
 
-    async login(req: Request, res: Response): Promise<void> {
+    async login(req: Request, res: Response): Promise<boolean> {
         try {
             const { login, password } = req.body;
-            
+            console.log(login, password);
             if (!login || !password) {
-                res.sendStatus(401);
+                res.json(false);
                 return;
             }
             
             const user = await this.userService.login(login, password);
             
             if (!user) {
-                res.sendStatus(401);
+                res.json(false);
                 return;
             }
             
-            res.json(user);
+            res.json(JSON.stringify(user));
         } catch (error) {
             console.error('Error during login:', error);
-            res.sendStatus(401);
+            res.json(false);
         }
     }
 }

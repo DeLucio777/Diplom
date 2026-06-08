@@ -33,6 +33,7 @@ export default class UserRepository {
         const result = await pool.request()
             .input('login', sql.VarChar(50), login)
             .query(`SELECT * FROM fun_GetUserByLogin(@login)`);
+
         
         if (result.recordset.length === 0) return null;
         return this.mapToUser(result.recordset[0]);
@@ -45,7 +46,8 @@ export default class UserRepository {
         const result = await pool.request()
             .input('login', sql.VarChar(50), login)
             .input('password', sql.VarChar(50), password)
-            .query(`SELECT * FROM fun_AuthUser(@login, @password)`);
+            .query(`SELECT * FROM tbl_User WHERE UserLogin = @login and UserPassword = @password`);
+
         
         if (result.recordset.length === 0) return null;
         return this.mapToUser(result.recordset[0]);
