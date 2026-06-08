@@ -24,7 +24,7 @@ class AuthController {
                 return;
             }
             
-            res.json(true);
+            res.json(JSON.stringify(user));
         } catch (error) {
             console.error('Error during login:', error);
             res.json(false);

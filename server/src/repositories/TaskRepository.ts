@@ -10,7 +10,28 @@ export default class TaskRepository {
         
         const result = await pool.request()
             .query(`
-                SELECT * FROM vw_GetAllTasksWithDetails`);
+                SELECT
+                    t.PK_TaskId,
+                    t.Title,
+                    t.Descripti,
+                    t.FK_TemplateId,
+                    t.FK_UserId,
+                    t.DifficultyLevel,
+                    t.UploadDate,
+                    t.public_task,
+
+                    tt.PK_TemplateId AS Template_PK_TemplateId,
+                    tt.TemplateName AS Template_TemplateName,
+                    tt.Descripti AS Template_Descripti,
+
+                    u.PK_UserId AS User_PK_UserId,
+                    u.first_name AS User_first_name,
+                    u.second_name AS User_second_name,
+                    u.phone AS User_phone
+                FROM tbl_Task t
+                         LEFT JOIN tbl_TaskTemplate tt ON t.FK_TemplateId = tt.PK_TemplateId
+                         LEFT JOIN tbl_User u ON t.FK_UserId = u.PK_UserId
+            `);
         
         return result.recordset.map((row: any) => this.mapToTask(row));
     }
