@@ -8,7 +8,7 @@ import SortItem from '../entities/sortItem';
 
 export default class TaskItemsRepository {
     
-    // ===== Task Constructions =====
+    // TaskConstructions
     async getConstructionsByTaskId(taskId: number): Promise<TaskConstruction[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -37,7 +37,7 @@ export default class TaskItemsRepository {
         return result.recordset[0];
     }
 
-    // ===== Find Odd One Out Items =====
+    // Find Odd One Out Items
     async getFindOddItemsByTaskId(taskId: number): Promise<FindOddOneOutItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -67,7 +67,7 @@ export default class TaskItemsRepository {
         return result.recordset[0];
     }
 
-    // ===== Match Image Word Pairs =====
+    //  Match Image Word Pairs 
     async getMatchPairsByTaskId(taskId: number): Promise<MatchImageWordPair[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -97,7 +97,7 @@ export default class TaskItemsRepository {
         return result.recordset[0];
     }
 
-    // ===== Sequence Items =====
+    // Sequence Items
     async getSequenceItemsByTaskId(taskId: number): Promise<SequenceItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -127,7 +127,7 @@ export default class TaskItemsRepository {
         return result.recordset[0];
     }
 
-    // ===== Sort Items =====
+    // Sort Items
     async getSortItemsByTaskId(taskId: number): Promise<SortItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -157,7 +157,7 @@ export default class TaskItemsRepository {
         return result.recordset[0];
     }
 
-    // ===== DELETE methods for cascade delete =====
+    // DELETE methods for cascade delete 
     async deleteConstructionsByTaskId(taskId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -213,7 +213,7 @@ export default class TaskItemsRepository {
         return true;
     }
 
-    // ===== Mappers =====
+    // Mappers 
     private mapToConstruction(row: any): TaskConstruction {
         const c = new TaskConstruction();
         c.PK_ConstructionId = row.PK_ConstructionId;
