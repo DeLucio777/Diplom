@@ -23,6 +23,10 @@ class UserService {
     async findByLogin(login: string): Promise<User | null> {
         return await this.userRepo.findByLogin(login);
     }
+
+    async create(user: User): Promise<User | null> {
+        return await this.userRepo.create(user);
+    }
 }
 
 export default UserService;

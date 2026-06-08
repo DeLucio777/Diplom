@@ -31,6 +31,12 @@ router.post('/', (req, res) => taskController.create(req, res));
 // POST /api/tasks/full 
 router.post('/full', (req, res) => taskController.createFull(req, res));
 
+// POST /api/tasks/:taskId/publish
+router.post('/:taskId/publish', (req, res) => taskController.publish(req, res));
+
+// PUT /api/tasks/:taskId/full
+router.put('/:taskId/full', (req, res) => taskController.updateFull(req, res));
+
 // DELETE /api/tasks/:id
 router.delete('/:id', (req, res) => taskController.delete(req, res));
 

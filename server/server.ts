@@ -6,6 +6,16 @@ import templatesRoute from './src/api/routes/templatesRoute';
 import pecsRoute from './src/api/routes/pecsRoute';
 import mediaRoute from './src/api/routes/mediaRoute';
 import authRoute from './src/api/routes/authRoute';
+import childrenRoute from './src/api/routes/childrenRoute';
+import educatorsRoute from './src/api/routes/educatorsRoute';
+import representativesRoute from './src/api/routes/representativesRoute';
+import diseasesRoute from './src/api/routes/diseasesRoute';
+import assignmentsRoute from './src/api/routes/assignmentsRoute';
+import progressRoute from './src/api/routes/progressRoute';
+import trajectoriesRoute from './src/api/routes/trajectoriesRoute';
+import groupsRoute from './src/api/routes/groupsRoute';
+import taskListsRoute from './src/api/routes/taskListsRoute';
+import achievementsRoute from './src/api/routes/achievementsRoute';
 import cors from 'cors';
 import { initDatabase } from './src/middlewares/dbConetxt';
 
@@ -22,6 +32,16 @@ app.use('/api/templates', templatesRoute);
 app.use('/api/pecs', pecsRoute);
 app.use('/api/media', mediaRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/children', childrenRoute);
+app.use('/api/educators', educatorsRoute);
+app.use('/api/representatives', representativesRoute);
+app.use('/api/diseases', diseasesRoute);
+app.use('/api/assignments', assignmentsRoute);
+app.use('/api/progress', progressRoute);
+app.use('/api/trajectories', trajectoriesRoute);
+app.use('/api/groups', groupsRoute);
+app.use('/api/task-lists', taskListsRoute);
+app.use('/api/achievements', achievementsRoute);
 
 async function startServer() {
     try {

@@ -148,6 +148,56 @@ class TaskController {
             res.status(500).json({ error: 'Failed to delete task' });
         }
     }
+
+    async publish(req: Request, res: Response): Promise<void> {
+        try {
+            const taskId = parseInt(req.params.taskId);
+            const { published } = req.body;
+            const success = await this.taskService.publish(taskId, published);
+            if (!success) {
+                res.status(404).json({ error: 'Task not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error publishing task:', error);
+            res.status(500).json({ error: 'Failed to publish task' });
+        }
+    }
+
+    async updateFull(req: Request, res: Response): Promise<void> {
+        try {
+            const taskId = parseInt(req.params.taskId);
+            const { 
+                task, 
+                constructions, 
+                findOddItems, 
+                matchPairs, 
+                sequenceItems, 
+                sortItems 
+            } = req.body;
+
+            const updated = await this.taskService.updateFull(taskId, {
+                task,
+                constructions,
+                findOddItems,
+                matchPairs,
+                sequenceItems,
+                sortItems
+            });
+
+            if (!updated) {
+                res.status(404).json({ error: 'Task not found' });
+                return;
+            }
+
+            const updatedTask = await this.taskService.getById(taskId);
+            res.json(updatedTask);
+        } catch (error) {
+            console.error('Error updating full task:', error);
+            res.status(500).json({ error: 'Failed to update full task' });
+        }
+    }
 }
 
 export default TaskController;

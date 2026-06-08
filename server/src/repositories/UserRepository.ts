@@ -53,7 +53,7 @@ export default class UserRepository {
         return this.mapToUser(result.recordset[0]);
     }
 
-    async create(user: User): Promise<number> {
+    async create(user: User): Promise<User | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
         
@@ -61,13 +61,20 @@ export default class UserRepository {
             .input('login', sql.VarChar(50), user.UserLogin)
             .input('password', sql.VarChar(50), user.UserPassword)
             .input('roleId', sql.Int, user.FK_RoleId)
+            .input('first_name', sql.VarChar(50), user.first_name || null)
+            .input('second_name', sql.VarChar(50), user.second_name || null)
+            .input('phone', sql.VarChar(50), user.phone || null)
             .query(`
---                 INSERT INTO tbl_User (UserLogin, UserPassword, FK_RoleId)
---                 VALUES (@login, @password, @roleId);
---                 SELECT SCOPE_IDENTITY() as Id;
+                INSERT INTO tbl_User (UserLogin, UserPassword, FK_RoleId, first_name, second_name, phone)
+                VALUES (@login, @password, @roleId, @first_name, @second_name, @phone);
+                SELECT SCOPE_IDENTITY() as Id;
             `);
         
-        return result.recordset[0];
+        const newId = result.recordset[0]?.Id;
+        if (newId) {
+            return this.getById(newId);
+        }
+        return null;
     }
 
     private mapToUser(row: any): User {
