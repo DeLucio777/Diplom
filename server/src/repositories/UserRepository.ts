@@ -20,7 +20,8 @@ export default class UserRepository {
         
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query(`SELECT * FROM fun_GetUserById(@id)`);
+            .query(`select *
+                    from tbl_User where PK_UserId = @id`);
         
         if (result.recordset.length === 0) return null;
         return this.mapToUser(result.recordset[0]);

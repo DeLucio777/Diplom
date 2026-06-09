@@ -33,12 +33,12 @@ class AuthController {
     async register(req: Request, res: Response): Promise<void> {
         try {
             const { login, password, roleId, first_name, second_name, phone } = req.body;
-            
+            console.log(`reister with: ${login} ${roleId} ${first_name} ${second_name} ${phone}`);
             if (!login || !password || !roleId) {
                 res.status(400).json({ error: 'Missing required fields' });
                 return;
             }
-            
+                
             const user = await this.userService.create({
                 PK_UserId: 0,
                 UserLogin: login,
