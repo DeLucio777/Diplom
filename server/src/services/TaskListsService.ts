@@ -25,11 +25,11 @@ class TaskListsService {
         return await this.taskListsRepo.getItems(taskListId);
     }
 
-    async create(taskList: TaskList): Promise<TaskList | null> {
-        return await this.taskListsRepo.create(taskList);
+    async create(taskList: TaskList, taskIds: number[] = [], userIds: number[] = []): Promise<TaskList | null> {
+        return await this.taskListsRepo.create(taskList, taskIds, userIds);
     }
 
-    async delete(id: number): Promise<void> {
+    async delete(id: number): Promise<boolean> {
         return await this.taskListsRepo.delete(id);
     }
 }

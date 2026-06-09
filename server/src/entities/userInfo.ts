@@ -11,4 +11,12 @@ export default class UserInfo {
   age?: number;                   // INT
   User?: User;                    // optional navigation property
   Disease?: Disease;              // optional navigation property
+  PerceptionFeatures?: string;
+  SpeechLevel?: string;
+  BackgroundColor?: string;
+  FontSize?: number;
+  ExcludeLoudSounds?: boolean;
+  RewardAnimation?: string;
+  FK_RepresentativeUserId?: number;
+  FK_EducatorUserId?: number;
 }

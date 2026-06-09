@@ -1,4 +1,4 @@
-import sql from 'mssql';
+import * as sql from 'mssql';
 import { getPool } from '../config/dbConfig';
 import Task from '../entities/task';
 
@@ -61,9 +61,9 @@ export default class TaskRepository {
             .query(`
                 INSERT INTO tbl_Task (Title, Descripti, FK_TemplateId, FK_UserId, DifficultyLevel, UploadDate)
                 VALUES (@title, @description, @templateId, @userId, @difficulty, GETDATE());
+                SELECT SCOPE_IDENTITY() as id;
             `);
-        ////exec pr_CreateTask @title, @description, @templateId, @userId, @difficulty
-        return 1;
+        return result.recordset[0]?.id || 0;
     }
 
     async update(id: number, task: Task): Promise<boolean> {

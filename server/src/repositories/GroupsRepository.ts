@@ -1,4 +1,4 @@
-import sql from 'mssql';
+import * as sql from 'mssql';
 import { getPool } from '../config/dbConfig';
 import Group from '../entities/group';
 import ChildGroupMember from '../entities/childrentToGroups';
@@ -99,13 +99,14 @@ export default class GroupsRepository {
         return null;
     }
 
-    async removeMember(memberId: number): Promise<boolean> {
+    async removeMember(groupId: number, childId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .input('memberId', sql.Int, memberId)
-            .query('DELETE FROM tbl_childrent_to_groups WHERE PK_MemberId = @memberId');
+            .input('groupId', sql.Int, groupId)
+            .input('childId', sql.Int, childId)
+            .query('DELETE FROM tbl_childrent_to_groups WHERE FK_GroupId = @groupId AND FK_ChildId = @childId');
         
         return result.rowsAffected[0] > 0;
     }

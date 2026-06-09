@@ -25,7 +25,7 @@ class SensoryProfileController {
     async create(req: Request, res: Response): Promise<void> {
         try {
             const childId = parseInt(req.params.childId);
-            const profile = await this.sensoryProfileService.create(childId, req.body);
+            const profile = await this.sensoryProfileService.save(childId, req.body);
             if (profile) {
                 res.status(201).json(profile);
             } else {

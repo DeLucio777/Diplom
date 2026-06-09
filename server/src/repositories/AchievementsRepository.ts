@@ -17,8 +17,8 @@ class AchievementsRepository {
             .query(`
                 SELECT ua.*, a.name, a.description, a.icon 
                 FROM UsersAchievements ua
-                JOIN Achievements a ON ua.achievementId = a.id
-                WHERE ua.userId = @userId
+                JOIN Achievements a ON ua.achivement_id = a.id
+                WHERE ua.user_id = @userId
             `);
         return result.recordset;
     }
@@ -26,11 +26,11 @@ class AchievementsRepository {
     async award(achievement: UsersAchievement): Promise<UsersAchievement | null> {
         const pool = await getConnection();
         const result = await pool.request()
-            .input('userId', achievement.userId)
-            .input('achievementId', achievement.achievementId)
+            .input('userId', achievement.user_id)
+            .input('achievementId', achievement.achivement_id)
             .input('awardedAt', achievement.awardedAt || new Date())
             .query(`
-                INSERT INTO UsersAchievements (userId, achievementId, awardedAt)
+                INSERT INTO UsersAchievements (user_id, achivement_id, awardedAt)
                 VALUES (@userId, @achievementId, @awardedAt);
                 SELECT SCOPE_IDENTITY() as id;
             `);
