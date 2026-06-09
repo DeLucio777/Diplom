@@ -49,9 +49,10 @@ class TaskListsController {
 
     async create(req: Request, res: Response): Promise<void> {
         try {
-            const taskList = await this.taskListsService.create(req.body);
-            if (taskList) {
-                res.status(201).json(taskList);
+            const { taskList, taskIds, userIds } = req.body;
+            const created = await this.taskListsService.create(taskList, taskIds, userIds);
+            if (created) {
+                res.status(201).json(created);
             } else {
                 res.status(400).json({ error: 'Failed to create task list' });
             }

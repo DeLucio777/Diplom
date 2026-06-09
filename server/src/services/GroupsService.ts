@@ -1,6 +1,6 @@
 import GroupsRepository from '../repositories/GroupsRepository';
 import Group from '../entities/group';
-import Child from '../entities/child';
+import ChildGroupMember from '../entities/childrentToGroups';
 
 class GroupsService {
     private groupsRepo: GroupsRepository;
@@ -17,7 +17,7 @@ class GroupsService {
         return await this.groupsRepo.getByEducator(educatorId);
     }
 
-    async getMembers(groupId: number): Promise<Child[]> {
+    async getMembers(groupId: number): Promise<ChildGroupMember[]> {
         return await this.groupsRepo.getMembers(groupId);
     }
 
@@ -25,15 +25,15 @@ class GroupsService {
         return await this.groupsRepo.create(group);
     }
 
-    async delete(id: number): Promise<void> {
+    async delete(id: number): Promise<boolean> {
         return await this.groupsRepo.delete(id);
     }
 
-    async addMember(groupId: number, childId: number): Promise<void> {
+    async addMember(groupId: number, childId: number): Promise<ChildGroupMember | null> {
         return await this.groupsRepo.addMember(groupId, childId);
     }
 
-    async removeMember(groupId: number, childId: number): Promise<void> {
+    async removeMember(groupId: number, childId: number): Promise<boolean> {
         return await this.groupsRepo.removeMember(groupId, childId);
     }
 }

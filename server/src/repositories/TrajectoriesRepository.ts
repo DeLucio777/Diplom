@@ -1,4 +1,4 @@
-import sql from 'mssql';
+import * as sql from 'mssql';
 import { getPool } from '../config/dbConfig';
 import LearningTrajectory from '../entities/learningTrajectory';
 import TrajectoryStep from '../entities/trajectoryStep';

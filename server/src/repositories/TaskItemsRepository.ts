@@ -1,4 +1,4 @@
-import sql from 'mssql';
+import * as sql from 'mssql';
 import { getPool } from '../config/dbConfig';
 import TaskConstruction from '../entities/taskConstructor';
 import FindOddOneOutItem from '../entities/findOddOneOutItems';

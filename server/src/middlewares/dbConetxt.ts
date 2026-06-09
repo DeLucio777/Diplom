@@ -1,5 +1,5 @@
 import { connect, getPool } from "../config/dbConfig";
-import sql from 'mssql';
+import * as sql from 'mssql';
 
 export async function initDatabase(): Promise<void> {
     await connect();
