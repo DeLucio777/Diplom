@@ -9,6 +9,7 @@ export default class Task {
     FK_UserId: number;       // INT NOT NULL (foreign key to User)
     Template?: TaskTemplate; // optional navigation property
     User?: User;             // optional navigation property
-    DifficultyLevel:string;
-    UploadDate:Date;
+    DifficultyLevel: string; // varchar(50) NOT NULL
+    UploadDate?: Date;       // DATE
+    public_task: boolean;    // BIT
 }

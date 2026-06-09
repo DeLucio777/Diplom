@@ -6,4 +6,7 @@ export default class User{
     UserPassword: string;    // varchar(50) NOT NULL
     FK_RoleId?: number;      // int (foreign key to Role)
     Role?: Role;             // optional navigation property
+    first_name?: string;     // varchar(50)
+    second_name?: string;    // varchar(50)
+    phone?: string;          // varchar(50)
 }

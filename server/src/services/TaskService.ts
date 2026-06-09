@@ -149,6 +149,109 @@ class TaskService {
         
         return await this.taskRepo.delete(id);
     }
+
+    async publish(taskId: number, published: boolean): Promise<boolean> {
+        return await this.taskRepo.publish(taskId, published);
+    }
+
+    async updateFull(taskId: number, data: {
+        task: Task;
+        constructions?: TaskConstruction[];
+        findOddItems?: FindOddOneOutItem[];
+        matchPairs?: MatchImageWordPair[];
+        sequenceItems?: SequenceItem[];
+        sortItems?: SortItem[];
+    }): Promise<boolean> {
+        const { 
+            task, 
+            constructions, 
+            findOddItems, 
+            matchPairs, 
+            sequenceItems, 
+            sortItems 
+        } = data;
+
+        // Delete existing items
+        await this.taskItemsRepo.deleteConstructionsByTaskId(taskId);
+        await this.taskItemsRepo.deleteFindOddItemsByTaskId(taskId);
+        await this.taskItemsRepo.deleteMatchPairsByTaskId(taskId);
+        await this.taskItemsRepo.deleteSequenceItemsByTaskId(taskId);
+        await this.taskItemsRepo.deleteSortItemsByTaskId(taskId);
+
+        // Update task
+        await this.taskRepo.update(taskId, task);
+
+        // Save new constructions
+        if (constructions && constructions.length > 0) {
+            for (const c of constructions) {
+                const construction: TaskConstruction = {
+                    PK_ConstructionId: 0,
+                    FK_TaskId: taskId,
+                    ParameterName: c.ParameterName,
+                    ParameterValue: c.ParameterValue
+                };
+                await this.taskItemsRepo.createConstruction(construction);
+            }
+        }
+
+        // Save new find odd items
+        if (findOddItems && findOddItems.length > 0) {
+            for (const item of findOddItems) {
+                const oddItem: FindOddOneOutItem = {
+                    PK_ItemId: 0,
+                    FK_TaskId: taskId,
+                    ItemText: item.ItemText,
+                    IsOddOne: item.IsOddOne,
+                    FK_pecsId: item.FK_pecsId
+                };
+                await this.taskItemsRepo.createFindOddItem(oddItem);
+            }
+        }
+
+        // Save new match pairs
+        if (matchPairs && matchPairs.length > 0) {
+            for (const pair of matchPairs) {
+                const matchPair: MatchImageWordPair = {
+                    PK_PairId: 0,
+                    FK_TaskId: taskId,
+                    FK_MediaId: pair.FK_MediaId || 0,
+                    FK_pecsId: pair.FK_pecsId,
+                    Words: pair.Words
+                };
+                await this.taskItemsRepo.createMatchPair(matchPair);
+            }
+        }
+
+        // Save new sequence items
+        if (sequenceItems && sequenceItems.length > 0) {
+            for (const item of sequenceItems) {
+                const seqItem: SequenceItem = {
+                    PK_SeqItemId: 0,
+                    FK_TaskId: taskId,
+                    ItemOrder: item.ItemOrder,
+                    ItemValue: item.ItemValue,
+                    FK_pecsId: item.FK_pecsId
+                };
+                await this.taskItemsRepo.createSequenceItem(seqItem);
+            }
+        }
+
+        // Save new sort items
+        if (sortItems && sortItems.length > 0) {
+            for (const item of sortItems) {
+                const sortItem: SortItem = {
+                    PK_SortItemId: 0,
+                    FK_TaskId: taskId,
+                    ItemValue: item.ItemValue,
+                    SortKey: item.SortKey,
+                    FK_pecsId: item.FK_pecsId
+                };
+                await this.taskItemsRepo.createSortItem(sortItem);
+            }
+        }
+
+        return true;
+    }
 }
 
 export default TaskService;

@@ -7,6 +7,7 @@ export default class SequenceItem {
   ItemOrder: number;           // INT NOT NULL
   ItemValue: string;           // varchar(255) NOT NULL
   FK_pecsId?: number;          // INT (foreign key to CatalogPECS)
+  Help?: string;               // varchar(255)
   Task?: Task;                 // optional navigation property
   PECS?: CatalogPECS;          // optional navigation property
 }

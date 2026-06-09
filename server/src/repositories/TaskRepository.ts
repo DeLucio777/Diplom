@@ -97,6 +97,18 @@ export default class TaskRepository {
         return result.rowsAffected[0] > 0;
     }
 
+    async publish(taskId: number, published: boolean): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        const result = await pool.request()
+            .input('id', sql.Int, taskId)
+            .input('published', sql.Bit, published ? 1 : 0)
+            .query('UPDATE tbl_Task SET public_task = @published WHERE PK_TaskId = @id');
+        
+        return result.rowsAffected[0] > 0;
+    }
+
     private mapToTask(row: any): Task {
         const task = new Task();
         task.PK_TaskId = row.PK_TaskId;
