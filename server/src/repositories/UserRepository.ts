@@ -46,7 +46,9 @@ export default class UserRepository {
         const result = await pool.request()
             .input('login', sql.VarChar(50), login)
             .input('password', sql.VarChar(50), password)
-            .query(`SELECT * FROM tbl_User WHERE UserLogin = @login and UserPassword = @password`);
+            .query(`SELECT * FROM tbl_User
+                join tbl_Roles on tbl_User.FK_RoleId = tbl_Roles.PK_RoleId
+                WHERE UserLogin = @login and UserPassword = @password `);
 
         
         if (result.recordset.length === 0) return null;
@@ -83,6 +85,9 @@ export default class UserRepository {
         user.UserLogin = row.UserLogin;
         user.UserPassword = row.UserPassword;
         user.FK_RoleId = row.FK_RoleId;
+        user.first_name = row.first_name;
+        user.second_name = row.second_name;
+        user.phone = row.phone;
         if (row.RoleName) {
             user.Role = {
                 PK_RoleId: row.FK_RoleId,

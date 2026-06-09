@@ -11,7 +11,6 @@ class AuthController {
     async login(req: Request, res: Response): Promise<boolean> {
         try {
             const { login, password } = req.body;
-            console.log(login, password);
             if (!login || !password) {
                 res.json(false);
                 return;
@@ -23,7 +22,7 @@ class AuthController {
                 res.json(false);
                 return;
             }
-            
+            console.log(user.Role);
             res.json(JSON.stringify(user));
         } catch (error) {
             console.error('Error during login:', error);
