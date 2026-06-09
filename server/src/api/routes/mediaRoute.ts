@@ -9,5 +9,6 @@ router.get('/', (req, res) => mediaController.getAll(req, res));
 
 // GET /api/media/:id 
 router.get('/:id', (req, res) => mediaController.getById(req, res));
+router.post('/', (req, res) => mediaController.upload(req, res));
 
 export default router;

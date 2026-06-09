@@ -32,6 +32,24 @@ class MediaController {
             res.status(500).json({ error: 'Failed to fetch media' });
         }
     }
+    async upload(req: Request, res: Response): Promise<void> {
+        try {
+            console.log('start upload media')
+            const file = req.file as Express.Multer.File;
+            const description = req.body.description;
+
+            if (!file) {
+                res.status(400).json({ error: 'File is required' });
+                return;
+            }
+
+            const saved = await this.mediaService.saveFile(file, description);
+            res.json(saved);
+        } catch (error) {
+            console.error('Error uploading media:', error);
+            res.status(500).json({ error: 'Failed to upload media' });
+        }
+    }
 }
 
 export default MediaController;

@@ -9,7 +9,7 @@ export default class MediaRepository {
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .query('SELECT * FROM vw_GetAllMedia');
+            .query('select * from tbl_MediaCatalog');
         
         return result.recordset.map((row: any) => this.mapToMedia(row));
     }

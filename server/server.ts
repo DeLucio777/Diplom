@@ -1,4 +1,9 @@
 import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
+
+// Routes
 import tasksRoute from './src/api/routes/tasksRoute';
 import rolesRoute from './src/api/routes/rolesRoute';
 import usersRoute from './src/api/routes/usersRoute';
@@ -16,15 +21,33 @@ import trajectoriesRoute from './src/api/routes/trajectoriesRoute';
 import groupsRoute from './src/api/routes/groupsRoute';
 import taskListsRoute from './src/api/routes/taskListsRoute';
 import achievementsRoute from './src/api/routes/achievementsRoute';
-import cors from 'cors';
+
 import { initDatabase } from './src/middlewares/dbConetxt';
 
-const app = express();
-app.use(cors());
+// ------------------------------
+// 1. Multer — загрузка файлов
+// ------------------------------
+const upload = multer({ storage: multer.memoryStorage() });
 
+// ------------------------------
+// Express app
+// ------------------------------
+const app = express();
+
+app.use(cors());
 app.use(express.json());
 
-// Routes
+// Multer должен быть ДО роутов
+app.use(upload.single('file'));
+
+// ------------------------------
+// 2. Раздача статики /uploads
+// ------------------------------
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+// ------------------------------
+// 3. Роуты API
+// ------------------------------
 app.use('/api/tasks', tasksRoute);
 app.use('/api/roles', rolesRoute);
 app.use('/api/users', usersRoute);
@@ -43,11 +66,14 @@ app.use('/api/groups', groupsRoute);
 app.use('/api/task-lists', taskListsRoute);
 app.use('/api/achievements', achievementsRoute);
 
+// ------------------------------
+// 4. Запуск сервера
+// ------------------------------
 async function startServer() {
     try {
         await initDatabase();
         console.log('База данных инициализирована');
-        
+
         const PORT = 3000;
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
