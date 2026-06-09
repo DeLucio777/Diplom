@@ -25,7 +25,7 @@ class UserInfoController {
     async create(req: Request, res: Response): Promise<void> {
         try {
             const userId = parseInt(req.params.userId);
-            const userInfo = await this.userInfoService.create(userId, req.body);
+            const userInfo = await this.userInfoService.create(userId, req.body);//todo: impliment method
             if (userInfo) {
                 res.status(201).json(userInfo);
             } else {

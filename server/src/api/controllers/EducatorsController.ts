@@ -34,7 +34,7 @@ class EducatorsController {
     async getByUser(req: Request, res: Response): Promise<void> {
         try {
             const userId = parseInt(req.params.userId);
-            const educator = await this.educatorsService.getByUser(userId);
+            const educator = await this.educatorsService.getByUser(userId);//todo: implement method
             if (educator) {
                 res.json(educator);
             } else {

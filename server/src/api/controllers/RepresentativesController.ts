@@ -20,7 +20,7 @@ class RepresentativesController {
     async getByUser(req: Request, res: Response): Promise<void> {
         try {
             const userId = parseInt(req.params.userId);
-            const representative = await this.representativesService.getByUser(userId);
+            const representative = await this.representativesService.getByUser(userId);//todo: implement method
             if (representative) {
                 res.json(representative);
             } else {

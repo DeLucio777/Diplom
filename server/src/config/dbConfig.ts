@@ -1,19 +1,13 @@
 import sql from 'mssql';
 
 const config: sql.config = {
-    server: 'localhost',
-    database: 'db_MainDataBaseDiplom',
+    server: 'MSI',
+    database: 'db_diplom',
+    user: 'DiplomUser',
+    password: 'StrongPass123!',
     options: {
-        encrypt: true,
-        trustServerCertificate: true,
-        enableArithAbort: true
-    },
-    authentication: {
-        type: 'default',
-        options: {
-            userName: 'DiplomUser',
-            password: 'StrongPass123!'
-        }
+        encrypt: false,
+        trustServerCertificate: true
     },
     pool: {
         max: 10,
@@ -32,11 +26,11 @@ export async function connect(): Promise<sql.ConnectionPool> {
     try {
         pool = await sql.connect(config);
         console.log('Подключение к БД установлено');
-        
+
         pool.on('error', (err) => {
             console.error('Ошибка пула подключений:', err);
         });
-        
+
         return pool;
     } catch (err) {
         console.error('Ошибка подключения к базе данных:', err);
