@@ -1,10 +1,10 @@
 import * as sql from 'mssql';
 
 const config: sql.config = {
-    server: 'MSI',
-    database: 'db_diplom',
+    server: 'localhost',
+    database: 'db_MainDataBaseDiplom',
     user: 'DiplomUser',
-    password: 'StrongPass123!',
+    password: '1231',
     options: {
         encrypt: false,
         trustServerCertificate: true

@@ -63,8 +63,8 @@ class GroupsController {
     async addMember(req: Request, res: Response): Promise<void> {
         try {
             const groupId = parseInt(req.params.groupId);
-            const { childId } = req.body;
-            await this.groupsService.addMember(groupId, childId);
+            const { userId } = req.body;
+            await this.groupsService.addMember(groupId, userId);
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ error: 'Failed to add member to group' });
@@ -74,8 +74,8 @@ class GroupsController {
     async removeMember(req: Request, res: Response): Promise<void> {
         try {
             const groupId = parseInt(req.params.groupId);
-            const childId = parseInt(req.params.childId);
-            await this.groupsService.removeMember(groupId, childId);
+            const userId = parseInt(req.params.userId);
+            await this.groupsService.removeMember(groupId, userId);
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ error: 'Failed to remove member from group' });

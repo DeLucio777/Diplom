@@ -7,220 +7,213 @@ import SequenceItem from '../entities/sequenceItem';
 import SortItem from '../entities/sortItem';
 
 export default class TaskItemsRepository {
-    
-    // TaskConstructions
     async getConstructionsByTaskId(taskId: number): Promise<TaskConstruction[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
-            .query('SELECT PK_ConstructionId, FK_TaskId, ParameterName, ParameterValue FROM tbl_TaskConstruction WHERE FK_TaskId = @taskId');
-        
+            .query('SELECT PK_ConstructionId, FK_TaskId, ParameterName, ParameterValue, Help FROM tbl_TaskConstruction WHERE FK_TaskId = @taskId');
+
         return result.recordset.map((row: any) => this.mapToConstruction(row));
     }
 
     async createConstruction(construction: TaskConstruction): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, construction.FK_TaskId)
             .input('paramName', sql.VarChar(100), construction.ParameterName)
             .input('paramValue', sql.VarChar(sql.MAX), construction.ParameterValue)
-            .input('help', sql.VarChar(255), construction.Help)
+            .input('help', sql.VarChar(255), construction.Help || null)
             .query(`
                 INSERT INTO tbl_TaskConstruction (FK_TaskId, ParameterName, ParameterValue, Help)
                 OUTPUT INSERTED.PK_ConstructionId
                 VALUES (@taskId, @paramName, @paramValue, @help);
             `);
-        
-        return result.recordset[0];
+
+        return result.recordset[0]?.PK_ConstructionId || 0;
     }
 
-    // Find Odd One Out Items
     async getFindOddItemsByTaskId(taskId: number): Promise<FindOddOneOutItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('SELECT PK_ItemId, FK_TaskId, ItemText, IsOddOne, FK_pecsId FROM tbl_FindOddOneOutItems WHERE FK_TaskId = @taskId');
-        
+
         return result.recordset.map((row: any) => this.mapToFindOddItem(row));
     }
 
     async createFindOddItem(item: FindOddOneOutItem): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, item.FK_TaskId)
             .input('itemText', sql.VarChar(255), item.ItemText)
             .input('isOddOne', sql.Bit, item.IsOddOne ? 1 : 0)
-            .input('pecsId', sql.Int, item.FK_pecsId)
+            .input('pecsId', sql.Int, item.FK_pecsId ?? null)
             .query(`
                 INSERT INTO tbl_FindOddOneOutItems (FK_TaskId, ItemText, IsOddOne, FK_pecsId)
                 OUTPUT INSERTED.PK_ItemId
                 VALUES (@taskId, @itemText, @isOddOne, @pecsId);
             `);
-        
-        return result.recordset[0];
+
+        return result.recordset[0]?.PK_ItemId || 0;
     }
 
-    //  Match Image Word Pairs 
     async getMatchPairsByTaskId(taskId: number): Promise<MatchImageWordPair[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('SELECT PK_PairId, FK_TaskId, FK_MediaId, FK_pecsId, Words FROM tbl_MatchImageWordPairs WHERE FK_TaskId = @taskId');
-        
+
         return result.recordset.map((row: any) => this.mapToMatchPair(row));
     }
 
     async createMatchPair(pair: MatchImageWordPair): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, pair.FK_TaskId)
             .input('mediaId', sql.Int, pair.FK_MediaId)
-            .input('pecsId', sql.Int, pair.FK_pecsId)
+            .input('pecsId', sql.Int, pair.FK_pecsId ?? null)
             .input('words', sql.VarChar(255), pair.Words)
             .query(`
                 INSERT INTO tbl_MatchImageWordPairs (FK_TaskId, FK_MediaId, FK_pecsId, Words)
                 OUTPUT INSERTED.PK_PairId
                 VALUES (@taskId, @mediaId, @pecsId, @words);
             `);
-        
-        return result.recordset[0];
+
+        return result.recordset[0]?.PK_PairId || 0;
     }
 
-    // Sequence Items
     async getSequenceItemsByTaskId(taskId: number): Promise<SequenceItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('SELECT PK_SeqItemId, FK_TaskId, ItemOrder, ItemValue, FK_pecsId FROM tbl_SequenceItems WHERE FK_TaskId = @taskId ORDER BY ItemOrder');
-        
+
         return result.recordset.map((row: any) => this.mapToSequenceItem(row));
     }
 
     async createSequenceItem(item: SequenceItem): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, item.FK_TaskId)
             .input('itemOrder', sql.Int, item.ItemOrder)
             .input('itemValue', sql.VarChar(255), item.ItemValue)
-            .input('pecsId', sql.Int, item.FK_pecsId)
+            .input('pecsId', sql.Int, item.FK_pecsId ?? null)
             .query(`
                 INSERT INTO tbl_SequenceItems (FK_TaskId, ItemOrder, ItemValue, FK_pecsId)
                 OUTPUT INSERTED.PK_SeqItemId
                 VALUES (@taskId, @itemOrder, @itemValue, @pecsId);
             `);
-        
-        return result.recordset[0];
+
+        return result.recordset[0]?.PK_SeqItemId || 0;
     }
 
-    // Sort Items
     async getSortItemsByTaskId(taskId: number): Promise<SortItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('SELECT PK_SortItemId, FK_TaskId, ItemValue, SortKey, FK_pecsId FROM tbl_SortItems WHERE FK_TaskId = @taskId');
-        
+
         return result.recordset.map((row: any) => this.mapToSortItem(row));
     }
 
     async createSortItem(item: SortItem): Promise<number> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('taskId', sql.Int, item.FK_TaskId)
             .input('itemValue', sql.VarChar(255), item.ItemValue)
             .input('sortKey', sql.VarChar(255), item.SortKey)
-            .input('pecsId', sql.Int, item.FK_pecsId)
+            .input('pecsId', sql.Int, item.FK_pecsId ?? null)
             .query(`
                 INSERT INTO tbl_SortItems (FK_TaskId, ItemValue, SortKey, FK_pecsId)
                 OUTPUT INSERTED.PK_SortItemId
                 VALUES (@taskId, @itemValue, @sortKey, @pecsId);
             `);
-        
-        return result.recordset[0];
+
+        return result.recordset[0]?.PK_SortItemId || 0;
     }
 
-    // DELETE methods for cascade delete 
     async deleteConstructionsByTaskId(taskId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('DELETE FROM tbl_TaskConstruction WHERE FK_TaskId = @taskId');
-        
+
         return true;
     }
 
     async deleteFindOddItemsByTaskId(taskId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('DELETE FROM tbl_FindOddOneOutItems WHERE FK_TaskId = @taskId');
-        
+
         return true;
     }
 
     async deleteMatchPairsByTaskId(taskId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('DELETE FROM tbl_MatchImageWordPairs WHERE FK_TaskId = @taskId');
-        
+
         return true;
     }
 
     async deleteSequenceItemsByTaskId(taskId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('DELETE FROM tbl_SequenceItems WHERE FK_TaskId = @taskId');
-        
+
         return true;
     }
 
     async deleteSortItemsByTaskId(taskId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         await pool.request()
             .input('taskId', sql.Int, taskId)
             .query('DELETE FROM tbl_SortItems WHERE FK_TaskId = @taskId');
-        
+
         return true;
     }
 
-    // Mappers 
     private mapToConstruction(row: any): TaskConstruction {
         const c = new TaskConstruction();
         c.PK_ConstructionId = row.PK_ConstructionId;
         c.FK_TaskId = row.FK_TaskId;
         c.ParameterName = row.ParameterName;
         c.ParameterValue = row.ParameterValue;
+        c.Help = row.Help;
         return c;
     }
 

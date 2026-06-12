@@ -2,53 +2,75 @@ import * as sql from 'mssql';
 import { getPool } from '../config/dbConfig';
 import Group from '../entities/group';
 import ChildGroupMember from '../entities/childrentToGroups';
+import Child from '../entities/child';
 
 export default class GroupsRepository {
-    
     async getAll(): Promise<Group[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .query('SELECT PK_Id, FK_Teacher_id FROM tbl_group');
-        
+
         return result.recordset.map((row: any) => this.mapToGroup(row));
     }
 
     async getByEducator(educatorId: number): Promise<Group[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('educatorId', sql.Int, educatorId)
             .query('SELECT PK_Id, FK_Teacher_id FROM tbl_group WHERE FK_Teacher_id = @educatorId');
-        
+
         return result.recordset.map((row: any) => this.mapToGroup(row));
     }
 
-    async getMembers(groupId: number): Promise<ChildGroupMember[]> {
+    async getMembers(groupId: number): Promise<Child[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('groupId', sql.Int, groupId)
-            .query('SELECT PK_MemberId, FK_GroupId, FK_ChildId FROM tbl_childrent_to_groups WHERE FK_GroupId = @groupId');
-        
-        return result.recordset.map((row: any) => this.mapToMember(row));
+            .query(`
+                SELECT
+                    u.PK_UserId,
+                    u.UserLogin,
+                    u.UserPassword,
+                    u.FK_RoleId,
+                    u.first_name,
+                    u.second_name,
+                    u.phone,
+                    u.email,
+                    ci.PK_Id AS ChildInfo_PK_Id,
+                    ci.FK_user_id AS ChildInfo_FK_user_id,
+                    ci.FK_disease_id AS ChildInfo_FK_disease_id,
+                    ci.complited_tasks_count AS ChildInfo_complited_tasks_count,
+                    ci.helpe_used_count AS ChildInfo_helpe_used_count,
+                    ci.miss_tasks_count AS ChildInfo_miss_tasks_count,
+                    ci.age AS ChildInfo_age,
+                    ci.speak_level AS ChildInfo_speak_level
+                FROM tbl_childrent_to_groups ctg
+                JOIN tbl_User u ON u.PK_UserId = ctg.FK_user_id
+                LEFT JOIN tbl_childInfo ci ON ci.FK_user_id = u.PK_UserId
+                WHERE ctg.FK_group_id = @groupId
+            `);
+
+        return result.recordset.map((row: any) => this.mapToChild(row));
     }
 
     async create(group: Group): Promise<Group | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('teacherId', sql.Int, group.FK_Teacher_id)
             .query(`
                 INSERT INTO tbl_group (FK_Teacher_id)
                 VALUES (@teacherId);
-                SELECT SCOPE_IDENTITY() as Id;
+                SELECT SCOPE_IDENTITY() AS Id;
             `);
-        
+
         const newId = result.recordset[0]?.Id;
         if (newId) {
             return this.getById(newId);
@@ -59,11 +81,11 @@ export default class GroupsRepository {
     async getById(id: number): Promise<Group | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('id', sql.Int, id)
             .query('SELECT PK_Id, FK_Teacher_id FROM tbl_group WHERE PK_Id = @id');
-        
+
         if (result.recordset.length === 0) return null;
         return this.mapToGroup(result.recordset[0]);
     }
@@ -71,27 +93,31 @@ export default class GroupsRepository {
     async delete(id: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
+        await pool.request()
+            .input('groupId', sql.Int, id)
+            .query('DELETE FROM tbl_childrent_to_groups WHERE FK_group_id = @groupId');
+
         const result = await pool.request()
             .input('id', sql.Int, id)
             .query('DELETE FROM tbl_group WHERE PK_Id = @id');
-        
+
         return result.rowsAffected[0] > 0;
     }
 
-    async addMember(groupId: number, childId: number): Promise<ChildGroupMember | null> {
+    async addMember(groupId: number, userId: number): Promise<ChildGroupMember | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('groupId', sql.Int, groupId)
-            .input('childId', sql.Int, childId)
+            .input('userId', sql.Int, userId)
             .query(`
-                INSERT INTO tbl_childrent_to_groups (FK_GroupId, FK_ChildId)
-                VALUES (@groupId, @childId);
-                SELECT SCOPE_IDENTITY() as Id;
+                INSERT INTO tbl_childrent_to_groups (FK_user_id, FK_group_id)
+                VALUES (@userId, @groupId);
+                SELECT SCOPE_IDENTITY() AS Id;
             `);
-        
+
         const newId = result.recordset[0]?.Id;
         if (newId) {
             return this.getMemberById(newId);
@@ -99,15 +125,15 @@ export default class GroupsRepository {
         return null;
     }
 
-    async removeMember(groupId: number, childId: number): Promise<boolean> {
+    async removeMember(groupId: number, userId: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('groupId', sql.Int, groupId)
-            .input('childId', sql.Int, childId)
-            .query('DELETE FROM tbl_childrent_to_groups WHERE FK_GroupId = @groupId AND FK_ChildId = @childId');
-        
+            .input('userId', sql.Int, userId)
+            .query('DELETE FROM tbl_childrent_to_groups WHERE FK_group_id = @groupId AND FK_user_id = @userId');
+
         return result.rowsAffected[0] > 0;
     }
 
@@ -118,23 +144,50 @@ export default class GroupsRepository {
         return group;
     }
 
-    private mapToMember(row: any): ChildGroupMember {
-        const member = new ChildGroupMember();
-        member.PK_MemberId = row.PK_MemberId;
-        member.FK_GroupId = row.FK_GroupId;
-        member.FK_ChildId = row.FK_ChildId;
-        return member;
-    }
-
     private async getMemberById(id: number): Promise<ChildGroupMember | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query('SELECT PK_MemberId, FK_GroupId, FK_ChildId FROM tbl_childrent_to_groups WHERE PK_MemberId = @id');
-        
+            .query('SELECT PK_Id, FK_user_id, FK_group_id FROM tbl_childrent_to_groups WHERE PK_Id = @id');
+
         if (result.recordset.length === 0) return null;
         return this.mapToMember(result.recordset[0]);
+    }
+
+    private mapToMember(row: any): ChildGroupMember {
+        const member = new ChildGroupMember();
+        member.PK_Id = row.PK_Id;
+        member.FK_user_id = row.FK_user_id;
+        member.FK_group_id = row.FK_group_id;
+        return member;
+    }
+
+    private mapToChild(row: any): Child {
+        const child = new Child();
+        child.PK_UserId = row.PK_UserId;
+        child.UserLogin = row.UserLogin;
+        child.UserPassword = row.UserPassword;
+        child.FK_RoleId = row.FK_RoleId;
+        child.first_name = row.first_name;
+        child.second_name = row.second_name;
+        child.phone = row.phone;
+        child.email = row.email;
+
+        if (row.ChildInfo_PK_Id) {
+            child.ChildInfo = {
+                PK_Id: row.ChildInfo_PK_Id,
+                FK_user_id: row.ChildInfo_FK_user_id,
+                FK_disease_id: row.ChildInfo_FK_disease_id,
+                complited_tasks_count: row.ChildInfo_complited_tasks_count,
+                helpe_used_count: row.ChildInfo_helpe_used_count,
+                miss_tasks_count: row.ChildInfo_miss_tasks_count,
+                age: row.ChildInfo_age,
+                speak_level: row.ChildInfo_speak_level
+            };
+        }
+
+        return child;
     }
 }

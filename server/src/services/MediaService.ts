@@ -2,6 +2,7 @@ import MediaRepository from '../repositories/MediaRepository';
 import MediaCatalog from '../entities/mediaCatalog';
 import fs from 'fs';
 import path from 'path';
+
 class MediaService {
     private mediaRepo: MediaRepository;
 
@@ -17,7 +18,7 @@ class MediaService {
         return await this.mediaRepo.getById(id);
     }
 
-    async saveFile(file: Express.Multer.File, description: string): Promise<MediaCatalog> {
+    async saveFile(file: any, description: string): Promise<MediaCatalog> {
         const uploadDir = path.join(process.cwd(), 'uploads', 'media');
 
         if (!fs.existsSync(uploadDir)) {
@@ -30,18 +31,18 @@ class MediaService {
         fs.writeFileSync(filepath, file.buffer);
 
         const media: MediaCatalog = {
-            PK_MediaId: Date.now(),              // или ID из БД
+            PK_MediaId: 0,
             FileType: file.mimetype,
             FilePath: `/uploads/media/${filename}`,
             Descripti: description,
             UploadDate: new Date()
         };
 
-        await this.mediaRepo.create(media);
+        const mediaId = await this.mediaRepo.create(media);
+        media.PK_MediaId = mediaId;
 
         return media;
     }
-
 }
 
 export default MediaService;

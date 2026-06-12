@@ -13,32 +13,33 @@ class AuthController {
             const { login, password } = req.body;
             if (!login || !password) {
                 res.json(false);
-                return;
+                return false;
             }
-            
+
             const user = await this.userService.login(login, password);
-            
+
             if (!user) {
                 res.json(false);
-                return;
+                return false;
             }
-            console.log(user.Role);
             res.json(user);
+            return true;
         } catch (error) {
             console.error('Error during login:', error);
             res.json(false);
+            return false;
         }
     }
 
     async register(req: Request, res: Response): Promise<void> {
         try {
-            const { login, password, roleId, first_name, second_name, phone } = req.body;
-            console.log(`reister with: ${login} ${roleId} ${first_name} ${second_name} ${phone}`);
+            const { login, password, roleId, first_name, second_name, phone, email } = req.body;
+            console.log(`register with: ${login} ${roleId} ${first_name} ${second_name} ${phone} ${email}`);
             if (!login || !password || !roleId) {
                 res.status(400).json({ error: 'Missing required fields' });
                 return;
             }
-                
+
             const user = await this.userService.create({
                 PK_UserId: 0,
                 UserLogin: login,
@@ -46,14 +47,15 @@ class AuthController {
                 FK_RoleId: roleId,
                 first_name,
                 second_name,
-                phone
+                phone,
+                email
             } as any);
-            
+
             if (!user) {
                 res.status(500).json({ error: 'Failed to create user' });
                 return;
             }
-            
+
             res.status(201).json(user);
         } catch (error) {
             console.error('Error during registration:', error);

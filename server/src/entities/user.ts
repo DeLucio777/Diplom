@@ -1,12 +1,13 @@
 import Role from "./role";
 
-export default class User{
-    PK_UserId: number;       // INT NOT NULL IDENTITY(1,1) PRIMARY KEY
-    UserLogin: string;       // varchar(50) NOT NULL
-    UserPassword: string;    // varchar(50) NOT NULL
-    FK_RoleId?: number;      // int (foreign key to Role)
-    Role?: Role;             // optional navigation property
-    first_name?: string;     // varchar(50)
-    second_name?: string;    // varchar(50)
-    phone?: string;          // varchar(50)
+export default class User {
+    PK_UserId: number;
+    UserLogin: string;
+    UserPassword: string;
+    FK_RoleId?: number;
+    Role?: Role;
+    first_name?: string;
+    second_name?: string;
+    phone?: string;
+    email?: string;
 }

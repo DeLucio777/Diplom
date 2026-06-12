@@ -20,10 +20,6 @@ class ChildrenService {
         return await this.childrenRepo.getByEducator(educatorId);
     }
 
-    async getByRepresentative(repId: number): Promise<Child[]> {
-        return await this.childrenRepo.getByRepresentative(repId);
-    }
-
     async create(child: Child): Promise<Child | null> {
         return await this.childrenRepo.create(child);
     }

@@ -41,16 +41,6 @@ class ChildrenController {
         }
     }
 
-    async getByRepresentative(req: Request, res: Response): Promise<void> {
-        try {
-            const representativeId = parseInt(req.params.representativeId);
-            const children = await this.childrenService.getByRepresentative(representativeId);
-            res.json(children);
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to get children by representative' });
-        }
-    }
-
     async create(req: Request, res: Response): Promise<void> {
         try {
             const child = await this.childrenService.create(req.body);

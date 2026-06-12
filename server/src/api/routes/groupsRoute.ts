@@ -22,7 +22,7 @@ router.delete('/:id', (req, res) => groupsController.delete(req, res));
 // POST /api/groups/:groupId/members
 router.post('/:groupId/members', (req, res) => groupsController.addMember(req, res));
 
-// DELETE /api/groups/:groupId/members/:childId
-router.delete('/:groupId/members/:childId', (req, res) => groupsController.removeMember(req, res));
+// DELETE /api/groups/:groupId/members/:userId
+router.delete('/:groupId/members/:userId', (req, res) => groupsController.removeMember(req, res));
 
 export default router;
