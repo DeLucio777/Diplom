@@ -116,7 +116,6 @@ class TaskController {
                 sequenceItems, 
                 sortItems 
             } = req.body;
-
             const taskId = await this.taskService.createFull({
                 task,
                 constructions,
@@ -127,6 +126,8 @@ class TaskController {
             });
 
             const createdTask = await this.taskService.getById(taskId);
+            console.log(createdTask);
+            
             res.status(201).json(createdTask);
         } catch (error) {
             console.error('Error creating full task:', error);

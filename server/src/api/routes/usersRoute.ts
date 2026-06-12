@@ -11,20 +11,12 @@ const userController = new UserController();
 const userService = new UserService();
 const userInfoController = new UserInfoController();
 
-// GET /api/users 
-router.get('/', (req, res) => userController.getAll(req, res));
-
-// GET /api/users/:id 
-router.get('/:id', (req, res) => userController.getById(req, res));
-
-// GET /api/users/:userId/info
-router.get('/:userId/info', (req, res) => userInfoController.getByUser(req, res));
-
-// POST /api/users/login
+// 1) Специфичные маршруты
 router.post('/login', (req, res) => authController.login(req, res));
-
-// POST /api/users/:userId/info
+router.get('/:userId/info', (req, res) => userInfoController.getByUser(req, res));
 router.post('/:userId/info', (req, res) => userInfoController.create(req, res));
 
-
+// 2) Общие маршруты
+router.get('/', (req, res) => userController.getAll(req, res));
+router.get('/:id', (req, res) => userController.getById(req, res));
 export default router;

@@ -39,10 +39,10 @@ export default class TaskRepository {
     async getById(id: number): Promise<Task | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query(`SELECT * FROM fun_GetTaskById(@id) `);
+            .query(`SELECT * FROM tbl_Task where PK_TaskId = @id`);
 
         
         if (result.recordset.length === 0) return null;
@@ -55,12 +55,13 @@ export default class TaskRepository {
         const result = await pool.request()
             .input('title', sql.VarChar(50), task.Title)
             .input('description', sql.VarChar(50), task.Descripti)
-            .input('templateId', sql.Int, task.FK_TemplateId)
-            .input('userId', sql.Int, task.FK_UserId)
-            .input('difficulty', sql.VarChar(50), task.DifficultyLevel)
+            .input('fK_TemplateId', sql.Int, task.FK_TemplateId)
+            .input('fK_UserId', sql.Int, task.FK_UserId)
+            .input('difficultyLevel', sql.VarChar(50), task.DifficultyLevel)
+            .input('public_task', sql.Bit, task.public_task)
             .query(`
-                INSERT INTO tbl_Task (Title, Descripti, FK_TemplateId, FK_UserId, DifficultyLevel, UploadDate)
-                VALUES (@title, @description, @templateId, @userId, @difficulty, GETDATE());
+                INSERT INTO tbl_Task (Title, Descripti, FK_TemplateId, FK_UserId, DifficultyLevel, UploadDate, public_task)
+                VALUES (@title, @description, @fK_TemplateId, @fK_UserId, @difficultyLevel, GETDATE(), @public_task);
                 SELECT SCOPE_IDENTITY() as id;
             `);
         return result.recordset[0]?.id || 0;

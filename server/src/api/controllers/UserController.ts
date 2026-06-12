@@ -21,7 +21,11 @@ class UserController {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
+            console.log("ID перед вызовом getById:", id);
+
             const user = await this.userService.getById(id);
+            console.log("user:", user);
+
             if (!user) {
                 res.status(404).json({ error: 'User not found' });
                 return;

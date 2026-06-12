@@ -9,7 +9,7 @@ export default class UserRepository {
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .query(`SELECT * FROM vw_UsersWithRoles`);
+            .query(`SELECT * FROM tbl_User`);
         
         return result.recordset.map((row: any) => this.mapToUser(row));
     }
@@ -17,12 +17,11 @@ export default class UserRepository {
     async getById(id: number): Promise<User | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
-        
+
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query(`select *
-                    from tbl_User where PK_UserId = @id`);
-        
+            .query(`select * from tbl_User where PK_UserId = @id`);
+
         if (result.recordset.length === 0) return null;
         return this.mapToUser(result.recordset[0]);
     }

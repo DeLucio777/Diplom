@@ -28,10 +28,11 @@ export default class TaskItemsRepository {
             .input('taskId', sql.Int, construction.FK_TaskId)
             .input('paramName', sql.VarChar(100), construction.ParameterName)
             .input('paramValue', sql.VarChar(sql.MAX), construction.ParameterValue)
+            .input('help', sql.VarChar(255), construction.Help)
             .query(`
-                INSERT INTO tbl_TaskConstruction (FK_TaskId, ParameterName, ParameterValue)
+                INSERT INTO tbl_TaskConstruction (FK_TaskId, ParameterName, ParameterValue, Help)
                 OUTPUT INSERTED.PK_ConstructionId
-                VALUES (@taskId, @paramName, @paramValue);
+                VALUES (@taskId, @paramName, @paramValue, @help);
             `);
         
         return result.recordset[0];
