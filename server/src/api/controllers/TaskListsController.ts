@@ -49,7 +49,20 @@ class TaskListsController {
 
     async create(req: Request, res: Response): Promise<void> {
         try {
-            const { taskList, taskIds, userIds } = req.body;
+            const body = req.body as any;
+            console.log(body);
+            const taskList = body.taskList || {
+                teacher_id: body.teacher_id ?? body.teacherId,
+                date_complite: body.date_complite ?? body.dateComplete
+            };
+            const taskIds = Array.isArray(body.taskIds) ? body.taskIds : [];
+            const userIds = Array.isArray(body.userIds) ? body.userIds : [];
+
+            if (!taskList.teacher_id) {
+                res.status(400).json({ error: 'teacher_id is required' });
+                return;
+            }
+
             const created = await this.taskListsService.create(taskList, taskIds, userIds);
             if (created) {
                 res.status(201).json(created);

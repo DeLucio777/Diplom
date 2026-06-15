@@ -4,10 +4,13 @@ import PecsController from '../controllers/PecsController';
 const router = Router();
 const pecsController = new PecsController();
 
-// GET /api/pecs 
+// GET /api/pecs
 router.get('/', (req, res) => pecsController.getAll(req, res));
 
 // GET /api/pecs/:id
 router.get('/:id', (req, res) => pecsController.getById(req, res));
+
+// POST /api/pecs
+router.post('/', (req, res) => pecsController.upload(req, res));
 
 export default router;

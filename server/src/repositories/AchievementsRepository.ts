@@ -36,6 +36,26 @@ class AchievementsRepository {
         return result.recordset.map((row: any) => this.mapToUsersAchievement(row));
     }
 
+    async getAllUserAchievements(): Promise<UsersAchievement[]> {
+        const pool = await getConnection();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query(`
+                SELECT
+                    ua.id,
+                    ua.achivement_id,
+                    ua.user_id,
+                    a.description,
+                    a.name,
+                    a.image_id
+                FROM tbl_users_achievement ua
+                JOIN tbl_achievement a ON a.id = ua.achivement_id
+            `);
+
+        return result.recordset.map((row: any) => this.mapToUsersAchievement(row));
+    }
+
     async award(achievement: UsersAchievement): Promise<UsersAchievement | null> {
         const pool = await getConnection();
         if (!pool) throw new Error('Database not connected');
@@ -44,6 +64,27 @@ class AchievementsRepository {
         await transaction.begin();
 
         try {
+            const existingResult = await transaction.request()
+                .input('userId', sql.Int, achievement.user_id)
+                .input('achievementId', sql.Int, achievement.achivement_id)
+                .query(`
+                    SELECT
+                        ua.id,
+                        ua.achivement_id,
+                        ua.user_id,
+                        a.description,
+                        a.name,
+                        a.image_id
+                    FROM tbl_users_achievement ua
+                    JOIN tbl_achievement a ON a.id = ua.achivement_id
+                    WHERE ua.user_id = @userId AND ua.achivement_id = @achievementId
+                `);
+
+            if (existingResult.recordset.length > 0) {
+                await transaction.commit();
+                return this.mapToUsersAchievement(existingResult.recordset[0]);
+            }
+
             const result = await transaction.request()
                 .input('userId', sql.Int, achievement.user_id)
                 .input('achievementId', sql.Int, achievement.achivement_id)

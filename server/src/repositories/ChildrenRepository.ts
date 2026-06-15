@@ -95,19 +95,19 @@ export default class ChildrenRepository {
             .input('login', sql.VarChar(50), child.UserLogin || null)
             .input('password', sql.VarChar(50), child.UserPassword || null)
             .input('roleId', sql.Int, child.FK_RoleId || PARENT_ROLE_ID)
-            .input('firstName', sql.VarChar(50), child.first_name || null)
-            .input('secondName', sql.VarChar(50), child.second_name || null)
-            .input('phone', sql.VarChar(50), child.phone || null)
-            .input('email', sql.NVarChar(255), child.email || null)
+            .input('firstName', sql.VarChar(50), child.first_name ?? null)
+            .input('secondName', sql.VarChar(50), child.second_name ?? null)
+            .input('phone', sql.VarChar(50), child.phone ?? null)
+            .input('email', sql.NVarChar(255), child.email ?? null)
             .query(`
                 UPDATE tbl_User
                 SET UserLogin = COALESCE(@login, UserLogin),
                     UserPassword = COALESCE(@password, UserPassword),
                     FK_RoleId = @roleId,
-                    first_name = @firstName,
-                    second_name = @secondName,
-                    phone = @phone,
-                    email = @email
+                    first_name = COALESCE(@firstName, first_name),
+                    second_name = COALESCE(@secondName, second_name),
+                    phone = COALESCE(@phone, phone),
+                    email = COALESCE(@email, email)
                 WHERE PK_UserId = @id AND FK_RoleId = ${PARENT_ROLE_ID}
             `);
 
@@ -118,12 +118,12 @@ export default class ChildrenRepository {
         if (existingInfo) {
             await pool.request()
                 .input('id', sql.Int, existingInfo.PK_Id)
-                .input('diseaseId', sql.Int, childInfo.FK_disease_id ?? null)
-                .input('completedTasksCount', sql.Int, childInfo.complited_tasks_count ?? null)
-                .input('helpsUsedCount', sql.Int, childInfo.helpe_used_count ?? null)
-                .input('missTasksCount', sql.Int, childInfo.miss_tasks_count ?? null)
-                .input('age', sql.Int, childInfo.age ?? null)
-                .input('speakLevel', sql.NVarChar(100), childInfo.speak_level ?? null)
+                .input('diseaseId', sql.Int, childInfo.FK_disease_id ?? existingInfo.FK_disease_id ?? null)
+                .input('completedTasksCount', sql.Int, childInfo.complited_tasks_count ?? existingInfo.complited_tasks_count ?? null)
+                .input('helpsUsedCount', sql.Int, childInfo.helpe_used_count ?? existingInfo.helpe_used_count ?? null)
+                .input('missTasksCount', sql.Int, childInfo.miss_tasks_count ?? existingInfo.miss_tasks_count ?? null)
+                .input('age', sql.Int, childInfo.age ?? existingInfo.age ?? null)
+                .input('speakLevel', sql.NVarChar(100), childInfo.speak_level ?? existingInfo.speak_level ?? null)
                 .query(`
                     UPDATE tbl_childInfo
                     SET FK_disease_id = @diseaseId,

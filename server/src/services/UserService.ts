@@ -27,6 +27,14 @@ class UserService {
     async create(user: User): Promise<User | null> {
         return await this.userRepo.create(user);
     }
+
+    async update(id: number, user: Partial<User>): Promise<User | null> {
+        return await this.userRepo.update(id, user);
+    }
+
+    async delete(id: number): Promise<boolean> {
+        return await this.userRepo.delete(id);
+    }
 }
 
 export default UserService;

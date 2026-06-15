@@ -9,7 +9,6 @@ class PecsController {
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
-        console.log('all pecs');
         try {
             const pecs = await this.pecsService.getAll();
             res.json(pecs);
@@ -20,7 +19,6 @@ class PecsController {
     }
 
     async getById(req: Request, res: Response): Promise<void> {
-        console.log('all pecs by id');
         try {
             const id = parseInt(req.params.id);
             const pecs = await this.pecsService.getById(id);
@@ -32,6 +30,30 @@ class PecsController {
         } catch (error) {
             console.error('Error fetching PECS:', error);
             res.status(500).json({ error: 'Failed to fetch PECS' });
+        }
+    }
+
+    async upload(req: Request, res: Response): Promise<void> {
+        try {
+            const file = req.file as any;
+            const description = req.body.description;
+            const category = req.body.category;
+
+            if (!file) {
+                res.status(400).json({ error: 'File is required' });
+                return;
+            }
+
+            if (!category) {
+                res.status(400).json({ error: 'Category is required' });
+                return;
+            }
+
+            const saved = await this.pecsService.saveFile(file, description, category);
+            res.json(saved);
+        } catch (error) {
+            console.error('Error uploading PECS:', error);
+            res.status(500).json({ error: 'Failed to upload PECS' });
         }
     }
 }

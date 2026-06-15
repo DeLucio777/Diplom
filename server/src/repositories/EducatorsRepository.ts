@@ -97,19 +97,39 @@ export default class EducatorsRepository {
     }
 
     async update(id: number, educator: Educator): Promise<boolean> {
+        const existing = await this.getById(id);
+        if (!existing) return false;
+
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
-        const result = await pool.request()
+        await pool.request()
             .input('id', sql.Int, id)
-            .input('specialization', sql.NVarChar(255), educator.Teacher_Specialization || null)
+            .input('specialization', sql.NVarChar(255), educator.Teacher_Specialization ?? existing.Teacher_Specialization ?? null)
             .query(`
                 UPDATE tbl_teacherInfo
                 SET Teacher_Specialization = @specialization
                 WHERE PK_Id = @id
             `);
 
-        return result.rowsAffected[0] > 0;
+        if (educator.User) {
+            await pool.request()
+                .input('userId', sql.Int, existing.FK_UserId)
+                .input('firstName', sql.VarChar(50), educator.User.first_name ?? null)
+                .input('secondName', sql.VarChar(50), educator.User.second_name ?? null)
+                .input('phone', sql.VarChar(50), educator.User.phone ?? null)
+                .input('email', sql.NVarChar(255), educator.User.email ?? null)
+                .query(`
+                    UPDATE tbl_User
+                    SET first_name = COALESCE(@firstName, first_name),
+                        second_name = COALESCE(@secondName, second_name),
+                        phone = COALESCE(@phone, phone),
+                        email = COALESCE(@email, email)
+                    WHERE PK_UserId = @userId
+                `);
+        }
+
+        return true;
     }
 
     async delete(id: number): Promise<boolean> {

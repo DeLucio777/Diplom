@@ -34,7 +34,6 @@ class MediaController {
     }
     async upload(req: Request, res: Response): Promise<void> {
         try {
-            console.log('start upload media')
             const file = req.file as any;
             const description = req.body.description;
 

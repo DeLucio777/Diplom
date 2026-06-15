@@ -10,7 +10,7 @@ export default class GroupsRepository {
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
-            .query('SELECT PK_Id, FK_Teacher_id FROM tbl_group');
+            .query('SELECT * FROM tbl_group');
 
         return result.recordset.map((row: any) => this.mapToGroup(row));
     }
@@ -21,7 +21,7 @@ export default class GroupsRepository {
 
         const result = await pool.request()
             .input('educatorId', sql.Int, educatorId)
-            .query('SELECT PK_Id, FK_Teacher_id FROM tbl_group WHERE FK_Teacher_id = @educatorId');
+            .query('SELECT * FROM tbl_group WHERE FK_Teacher_id = @educatorId');
 
         return result.recordset.map((row: any) => this.mapToGroup(row));
     }
@@ -59,15 +59,26 @@ export default class GroupsRepository {
         return result.recordset.map((row: any) => this.mapToChild(row));
     }
 
+    async getAllMembers(): Promise<ChildGroupMember[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query('SELECT PK_Id, FK_user_id, FK_group_id FROM tbl_childrent_to_groups');
+
+        return result.recordset.map((row: any) => this.mapToMember(row));
+    }
+
     async create(group: Group): Promise<Group | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('teacherId', sql.Int, group.FK_Teacher_id)
+            .input('groupName', sql.VarChar(50), group.GroupName)
             .query(`
-                INSERT INTO tbl_group (FK_Teacher_id)
-                VALUES (@teacherId);
+                INSERT INTO tbl_group (FK_Teacher_id, groupName)
+                VALUES (@teacherId, @groupName);
                 SELECT SCOPE_IDENTITY() AS Id;
             `);
 
@@ -109,20 +120,27 @@ export default class GroupsRepository {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
-        const result = await pool.request()
-            .input('groupId', sql.Int, groupId)
-            .input('userId', sql.Int, userId)
-            .query(`
-                INSERT INTO tbl_childrent_to_groups (FK_user_id, FK_group_id)
-                VALUES (@userId, @groupId);
-                SELECT SCOPE_IDENTITY() AS Id;
-            `);
+        const existing = await this.getMember(groupId, userId);
+        if (existing) return existing;
 
-        const newId = result.recordset[0]?.Id;
-        if (newId) {
-            return this.getMemberById(newId);
+        try {
+            const result = await pool.request()
+                .input('groupId', sql.Int, groupId)
+                .input('userId', sql.Int, userId)
+                .query(`
+                    INSERT INTO tbl_childrent_to_groups (FK_user_id, FK_group_id)
+                    VALUES (@userId, @groupId);
+                    SELECT SCOPE_IDENTITY() AS Id;
+                `);
+
+            const newId = result.recordset[0]?.Id;
+            if (newId) {
+                return this.getMemberById(newId);
+            }
+            return null;
+        } catch (error) {
+            return this.getMember(groupId, userId);
         }
-        return null;
     }
 
     async removeMember(groupId: number, userId: number): Promise<boolean> {
@@ -137,11 +155,36 @@ export default class GroupsRepository {
         return result.rowsAffected[0] > 0;
     }
 
+    async removeMemberById(memberId: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('memberId', sql.Int, memberId)
+            .query('DELETE FROM tbl_childrent_to_groups WHERE PK_Id = @memberId');
+
+        return result.rowsAffected[0] > 0;
+    }
+
     private mapToGroup(row: any): Group {
         const group = new Group();
         group.PK_Id = row.PK_Id;
         group.FK_Teacher_id = row.FK_Teacher_id;
+        group.GroupName = row.groupName;
         return group;
+    }
+
+    private async getMember(groupId: number, userId: number): Promise<ChildGroupMember | null> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('groupId', sql.Int, groupId)
+            .input('userId', sql.Int, userId)
+            .query('SELECT PK_Id, FK_user_id, FK_group_id FROM tbl_childrent_to_groups WHERE FK_group_id = @groupId AND FK_user_id = @userId');
+
+        if (result.recordset.length === 0) return null;
+        return this.mapToMember(result.recordset[0]);
     }
 
     private async getMemberById(id: number): Promise<ChildGroupMember | null> {

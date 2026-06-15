@@ -18,5 +18,8 @@ router.post('/:userId/info', (req, res) => userInfoController.create(req, res));
 
 // 2) Общие маршруты
 router.get('/', (req, res) => userController.getAll(req, res));
+router.get('/by-login/:login', (req, res) => userController.getByLogin(req, res));
 router.get('/:id', (req, res) => userController.getById(req, res));
+router.put('/:id', (req, res) => userController.update(req, res));
+router.delete('/:id', (req, res) => userController.delete(req, res));
 export default router;

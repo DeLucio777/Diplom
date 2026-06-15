@@ -21,10 +21,8 @@ class UserController {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            console.log("ID перед вызовом getById:", id);
 
             const user = await this.userService.getById(id);
-            console.log("user:", user);
 
             if (!user) {
                 res.status(404).json({ error: 'User not found' });
@@ -34,6 +32,47 @@ class UserController {
         } catch (error) {
             console.error('Error fetching user:', error);
             res.status(500).json({ error: 'Failed to fetch user' });
+        }
+    }
+
+    async getByLogin(req: Request, res: Response): Promise<void> {
+        try {
+            const login = req.params.login;
+            const user = await this.userService.findByLogin(login);
+            res.json(user);
+        } catch (error) {
+            console.error('Error fetching user by login:', error);
+            res.status(500).json({ error: 'Failed to fetch user by login' });
+        }
+    }
+
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const user = await this.userService.update(id, req.body);
+            if (!user) {
+                res.status(404).json({ error: 'User not found' });
+                return;
+            }
+            res.json(user);
+        } catch (error) {
+            console.error('Error updating user:', error);
+            res.status(500).json({ error: 'Failed to update user' });
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.userService.delete(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'User not found or cannot be deleted because related records exist' });
+                return;
+            }
+            res.status(204).send();
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            res.status(500).json({ error: 'Failed to delete user' });
         }
     }
 }

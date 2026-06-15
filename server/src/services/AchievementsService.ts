@@ -17,6 +17,10 @@ class AchievementsService {
         return await this.achievementsRepo.getByUser(userId);
     }
 
+    async getAllUserAchievements(): Promise<UsersAchievement[]> {
+        return await this.achievementsRepo.getAllUserAchievements();
+    }
+
     async award(achievement: UsersAchievement): Promise<UsersAchievement | null> {
         return await this.achievementsRepo.award(achievement);
     }

@@ -22,6 +22,10 @@ class GroupsService {
         return await this.groupsRepo.getMembers(groupId);
     }
 
+    async getAllMembers(): Promise<ChildGroupMember[]> {
+        return await this.groupsRepo.getAllMembers();
+    }
+
     async create(group: Group): Promise<Group | null> {
         return await this.groupsRepo.create(group);
     }
@@ -36,6 +40,10 @@ class GroupsService {
 
     async removeMember(groupId: number, userId: number): Promise<boolean> {
         return await this.groupsRepo.removeMember(groupId, userId);
+    }
+
+    async removeMemberById(memberId: number): Promise<boolean> {
+        return await this.groupsRepo.removeMemberById(memberId);
     }
 }
 

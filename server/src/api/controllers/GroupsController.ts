@@ -37,6 +37,15 @@ class GroupsController {
         }
     }
 
+    async getAllMembers(req: Request, res: Response): Promise<void> {
+        try {
+            const members = await this.groupsService.getAllMembers();
+            res.json(members);
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to get group members' });
+        }
+    }
+
     async create(req: Request, res: Response): Promise<void> {
         try {
             const group = await this.groupsService.create(req.body);
@@ -62,10 +71,14 @@ class GroupsController {
 
     async addMember(req: Request, res: Response): Promise<void> {
         try {
-            const groupId = parseInt(req.params.groupId);
-            const { userId } = req.body;
-            await this.groupsService.addMember(groupId, userId);
-            res.status(204).send();
+            const groupId = parseInt(req.params.groupId || req.body.FK_group_id || req.body.groupId);
+            const userId = parseInt(req.body.userId || req.body.FK_user_id);
+            const member = await this.groupsService.addMember(groupId, userId);
+            if (!member) {
+                res.status(400).json({ error: 'Failed to add member to group' });
+                return;
+            }
+            res.status(201).json(member);
         } catch (error) {
             res.status(500).json({ error: 'Failed to add member to group' });
         }
@@ -79,6 +92,20 @@ class GroupsController {
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ error: 'Failed to remove member from group' });
+        }
+    }
+
+    async removeMemberById(req: Request, res: Response): Promise<void> {
+        try {
+            const memberId = parseInt(req.params.memberId);
+            const deleted = await this.groupsService.removeMemberById(memberId);
+            if (!deleted) {
+                res.status(404).json({ error: 'Group member not found' });
+                return;
+            }
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to remove group member' });
         }
     }
 }

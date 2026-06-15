@@ -66,7 +66,7 @@ export default class UserRepository {
                     u.FK_RoleId,
                     u.first_name,
                     u.second_name,
-                    u.phone,
+                    u.phone, 
                     u.email,
                     r.RoleName
                 FROM tbl_User u
@@ -128,6 +128,63 @@ export default class UserRepository {
             return this.getById(newId);
         }
         return null;
+    }
+
+    async update(id: number, user: Partial<User>): Promise<User | null> {
+        const existing = await this.getById(id);
+        if (!existing) return null;
+
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        await pool.request()
+            .input('id', sql.Int, id)
+            .input('login', sql.VarChar(50), user.UserLogin ?? existing.UserLogin)
+            .input('password', sql.VarChar(50), user.UserPassword ?? existing.UserPassword)
+            .input('roleId', sql.Int, user.FK_RoleId ?? existing.FK_RoleId ?? null)
+            .input('firstName', sql.VarChar(50), user.first_name ?? existing.first_name ?? null)
+            .input('secondName', sql.VarChar(50), user.second_name ?? existing.second_name ?? null)
+            .input('phone', sql.VarChar(50), user.phone ?? existing.phone ?? null)
+            .input('email', sql.NVarChar(255), user.email ?? existing.email ?? null)
+            .query(`
+                UPDATE tbl_User
+                SET UserLogin = @login,
+                    UserPassword = @password,
+                    FK_RoleId = @roleId,
+                    first_name = @firstName,
+                    second_name = @secondName,
+                    phone = @phone,
+                    email = @email
+                WHERE PK_UserId = @id
+            `);
+
+        return this.getById(id);
+    }
+
+    async delete(id: number): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        try {
+            await pool.request()
+                .input('userId', sql.Int, id)
+                .query(`
+                    DELETE FROM tbl_childrent_to_groups WHERE FK_user_id = @userId;
+                    DELETE FROM tbl_childInfo WHERE FK_user_id = @userId;
+                    DELETE FROM tbl_teacherInfo WHERE FK_UserId = @userId;
+                    DELETE FROM tbl_users_achievement WHERE user_id = @userId;
+                    DELETE FROM tbl_task_lst_to_data WHERE user_id = @userId;
+                `);
+
+            const result = await pool.request()
+                .input('id', sql.Int, id)
+                .query('DELETE FROM tbl_User WHERE PK_UserId = @id');
+
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            console.error('Failed to delete user:', error);
+            return false;
+        }
     }
 
     private mapToUser(row: any): User {

@@ -7,13 +7,23 @@ import SequenceItem from '../entities/sequenceItem';
 import SortItem from '../entities/sortItem';
 
 export default class TaskItemsRepository {
+    async getAllConstructions(): Promise<TaskConstruction[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query('SELECT PK_ConstructionId, FK_TaskId, ParameterName, ParameterValue, Help FROM tbl_TaskConstruction ORDER BY FK_TaskId, PK_ConstructionId');
+
+        return result.recordset.map((row: any) => this.mapToConstruction(row));
+    }
+
     async getConstructionsByTaskId(taskId: number): Promise<TaskConstruction[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
-            .query('SELECT PK_ConstructionId, FK_TaskId, ParameterName, ParameterValue, Help FROM tbl_TaskConstruction WHERE FK_TaskId = @taskId');
+            .query('SELECT PK_ConstructionId, FK_TaskId, ParameterName, ParameterValue, Help FROM tbl_TaskConstruction WHERE FK_TaskId = @taskId ORDER BY PK_ConstructionId');
 
         return result.recordset.map((row: any) => this.mapToConstruction(row));
     }
@@ -36,13 +46,23 @@ export default class TaskItemsRepository {
         return result.recordset[0]?.PK_ConstructionId || 0;
     }
 
+    async getAllFindOddItems(): Promise<FindOddOneOutItem[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query('SELECT PK_ItemId, FK_TaskId, ItemText, IsOddOne, FK_pecsId FROM tbl_FindOddOneOutItems ORDER BY FK_TaskId, PK_ItemId');
+
+        return result.recordset.map((row: any) => this.mapToFindOddItem(row));
+    }
+
     async getFindOddItemsByTaskId(taskId: number): Promise<FindOddOneOutItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
-            .query('SELECT PK_ItemId, FK_TaskId, ItemText, IsOddOne, FK_pecsId FROM tbl_FindOddOneOutItems WHERE FK_TaskId = @taskId');
+            .query('SELECT PK_ItemId, FK_TaskId, ItemText, IsOddOne, FK_pecsId FROM tbl_FindOddOneOutItems WHERE FK_TaskId = @taskId ORDER BY PK_ItemId');
 
         return result.recordset.map((row: any) => this.mapToFindOddItem(row));
     }
@@ -65,13 +85,23 @@ export default class TaskItemsRepository {
         return result.recordset[0]?.PK_ItemId || 0;
     }
 
+    async getAllMatchPairs(): Promise<MatchImageWordPair[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query('SELECT PK_PairId, FK_TaskId, FK_MediaId, FK_pecsId, Words FROM tbl_MatchImageWordPairs ORDER BY FK_TaskId, PK_PairId');
+
+        return result.recordset.map((row: any) => this.mapToMatchPair(row));
+    }
+
     async getMatchPairsByTaskId(taskId: number): Promise<MatchImageWordPair[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
-            .query('SELECT PK_PairId, FK_TaskId, FK_MediaId, FK_pecsId, Words FROM tbl_MatchImageWordPairs WHERE FK_TaskId = @taskId');
+            .query('SELECT PK_PairId, FK_TaskId, FK_MediaId, FK_pecsId, Words FROM tbl_MatchImageWordPairs WHERE FK_TaskId = @taskId ORDER BY PK_PairId');
 
         return result.recordset.map((row: any) => this.mapToMatchPair(row));
     }
@@ -94,13 +124,23 @@ export default class TaskItemsRepository {
         return result.recordset[0]?.PK_PairId || 0;
     }
 
+    async getAllSequenceItems(): Promise<SequenceItem[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query('SELECT PK_SeqItemId, FK_TaskId, ItemOrder, ItemValue, FK_pecsId FROM tbl_SequenceItems ORDER BY FK_TaskId, ItemOrder, PK_SeqItemId');
+
+        return result.recordset.map((row: any) => this.mapToSequenceItem(row));
+    }
+
     async getSequenceItemsByTaskId(taskId: number): Promise<SequenceItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
-            .query('SELECT PK_SeqItemId, FK_TaskId, ItemOrder, ItemValue, FK_pecsId FROM tbl_SequenceItems WHERE FK_TaskId = @taskId ORDER BY ItemOrder');
+            .query('SELECT PK_SeqItemId, FK_TaskId, ItemOrder, ItemValue, FK_pecsId FROM tbl_SequenceItems WHERE FK_TaskId = @taskId ORDER BY ItemOrder, PK_SeqItemId');
 
         return result.recordset.map((row: any) => this.mapToSequenceItem(row));
     }
@@ -123,13 +163,23 @@ export default class TaskItemsRepository {
         return result.recordset[0]?.PK_SeqItemId || 0;
     }
 
+    async getAllSortItems(): Promise<SortItem[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query('SELECT PK_SortItemId, FK_TaskId, ItemValue, SortKey, FK_pecsId FROM tbl_SortItems ORDER BY FK_TaskId, SortKey, PK_SortItemId');
+
+        return result.recordset.map((row: any) => this.mapToSortItem(row));
+    }
+
     async getSortItemsByTaskId(taskId: number): Promise<SortItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('taskId', sql.Int, taskId)
-            .query('SELECT PK_SortItemId, FK_TaskId, ItemValue, SortKey, FK_pecsId FROM tbl_SortItems WHERE FK_TaskId = @taskId');
+            .query('SELECT PK_SortItemId, FK_TaskId, ItemValue, SortKey, FK_pecsId FROM tbl_SortItems WHERE FK_TaskId = @taskId ORDER BY SortKey, PK_SortItemId');
 
         return result.recordset.map((row: any) => this.mapToSortItem(row));
     }

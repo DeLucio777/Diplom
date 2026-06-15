@@ -47,7 +47,7 @@ class EducatorsController {
 
     async create(req: Request, res: Response): Promise<void> {
         try {
-            const educator = await this.educatorsService.create(req.body);
+            const educator = await this.educatorsService.create(this.normalizePayload(req.body));
             if (educator) {
                 res.status(201).json(educator);
             } else {
@@ -61,7 +61,7 @@ class EducatorsController {
     async update(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const educator = await this.educatorsService.update(id, req.body);
+            const educator = await this.educatorsService.update(id, this.normalizePayload(req.body));
             if (educator) {
                 res.json(educator);
             } else {
@@ -80,6 +80,35 @@ class EducatorsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to delete educator' });
         }
+    }
+
+    private normalizePayload(body: any): any {
+        const educator = { ...body };
+        const user: any = { ...(body.User || {}) };
+
+        if (body.FullName) {
+            const [first_name, second_name] = body.FullName.split(' ');
+            user.first_name = first_name;
+            user.second_name = second_name || null;
+        }
+
+        if (body.Phone !== undefined) {
+            user.phone = body.Phone;
+        }
+
+        if (body.Email !== undefined) {
+            user.email = body.Email;
+        }
+
+        if (Object.keys(user).length > 0) {
+            educator.User = user;
+        }
+
+        if (body.Specialization !== undefined) {
+            educator.Teacher_Specialization = body.Specialization;
+        }
+
+        return educator;
     }
 }
 

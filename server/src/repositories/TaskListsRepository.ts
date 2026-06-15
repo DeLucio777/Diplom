@@ -57,6 +57,36 @@ export default class TaskListsRepository {
         return result.recordset.map((row: any) => this.mapToTaskListItem(row));
     }
 
+    async getAllItems(): Promise<TaskListItem[]> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .query(`
+                SELECT id, task_id, task_list_id, position, user_id, complited
+                FROM tbl_task_lst_to_data
+                ORDER BY task_list_id, position
+            `);
+
+        return result.recordset.map((row: any) => this.mapToTaskListItem(row));
+    }
+
+    async getItemById(id: number): Promise<TaskListItem | null> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('id', sql.Int, id)
+            .query(`
+                SELECT id, task_id, task_list_id, position, user_id, complited
+                FROM tbl_task_lst_to_data
+                WHERE id = @id
+            `);
+
+        if (result.recordset.length === 0) return null;
+        return this.mapToTaskListItem(result.recordset[0]);
+    }
+
     async getItemsForUser(listId: number, userId: number): Promise<TaskListItem[]> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
@@ -72,6 +102,46 @@ export default class TaskListsRepository {
             `);
 
         return result.recordset.map((row: any) => this.mapToTaskListItem(row));
+    }
+
+    async updateItemCompletion(itemId: number, completed: boolean): Promise<TaskListItem | null> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('itemId', sql.Int, itemId)
+            .input('completed', sql.Bit, completed ? 1 : 0)
+            .query(`
+                UPDATE tbl_task_lst_to_data
+                SET complited = @completed
+                WHERE id = @itemId;
+
+                SELECT id, task_id, task_list_id, position, user_id, complited
+                FROM tbl_task_lst_to_data
+                WHERE id = @itemId;
+            `);
+
+        if (result.recordset.length === 0) return null;
+        return this.mapToTaskListItem(result.recordset[0]);
+    }
+
+    async updateItemsForUser(taskListId: number, userId: number, completed: boolean): Promise<number> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('taskListId', sql.Int, taskListId)
+            .input('userId', sql.Int, userId)
+            .input('completed', sql.Bit, completed ? 1 : 0)
+            .query(`
+                UPDATE tbl_task_lst_to_data
+                SET complited = @completed
+                WHERE task_list_id = @taskListId AND user_id = @userId;
+
+                SELECT @@ROWCOUNT AS UpdatedRows;
+            `);
+
+        return result.recordset[0]?.UpdatedRows || 0;
     }
 
     async create(taskList: TaskList, taskIds: number[], userIds: number[]): Promise<TaskList | null> {

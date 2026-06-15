@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
 import UserService from '../../services/UserService';
+import UserInfoRepository from '../../repositories/UserInfoRepository';
+import TeacherInfoRepository from '../../repositories/TeacherInfoRepository';
 
 class AuthController {
     private userService: UserService;
+    private userInfoRepository: UserInfoRepository;
+    private teacherInfoRepository: TeacherInfoRepository;
 
     constructor() {
         this.userService = new UserService();
+        this.userInfoRepository = new UserInfoRepository();
+        this.teacherInfoRepository = new TeacherInfoRepository();
     }
 
     async login(req: Request, res: Response): Promise<boolean> {
@@ -34,7 +40,6 @@ class AuthController {
     async register(req: Request, res: Response): Promise<void> {
         try {
             const { login, password, roleId, first_name, second_name, phone, email } = req.body;
-            console.log(`register with: ${login} ${roleId} ${first_name} ${second_name} ${phone} ${email}`);
             if (!login || !password || !roleId) {
                 res.status(400).json({ error: 'Missing required fields' });
                 return;
@@ -54,6 +59,12 @@ class AuthController {
             if (!user) {
                 res.status(500).json({ error: 'Failed to create user' });
                 return;
+            }
+
+            if (roleId === 1) {
+                await this.userInfoRepository.save(user.PK_UserId, {});
+            } else if (roleId === 2) {
+                await this.teacherInfoRepository.save(user.PK_UserId, {});
             }
 
             res.status(201).json(user);

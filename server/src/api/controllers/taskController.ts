@@ -39,6 +39,16 @@ class TaskController {
         }
     }
 
+    async getAllConstructions(req: Request, res: Response): Promise<void> {
+        try {
+            const constructions = await this.taskService.getAllConstructions();
+            res.json(constructions);
+        } catch (error) {
+            console.error('Error fetching constructions:', error);
+            res.status(500).json({ error: 'Failed to fetch constructions' });
+        }
+    }
+
     async getConstructions(req: Request, res: Response): Promise<void> {
         try {
             const taskId = parseInt(req.params.taskId);
@@ -47,6 +57,16 @@ class TaskController {
         } catch (error) {
             console.error('Error fetching constructions:', error);
             res.status(500).json({ error: 'Failed to fetch constructions' });
+        }
+    }
+
+    async getAllFindOddItems(req: Request, res: Response): Promise<void> {
+        try {
+            const items = await this.taskService.getAllFindOddItems();
+            res.json(items);
+        } catch (error) {
+            console.error('Error fetching find odd items:', error);
+            res.status(500).json({ error: 'Failed to fetch find odd items' });
         }
     }
 
@@ -61,6 +81,16 @@ class TaskController {
         }
     }
 
+    async getAllMatchPairs(req: Request, res: Response): Promise<void> {
+        try {
+            const pairs = await this.taskService.getAllMatchPairs();
+            res.json(pairs);
+        } catch (error) {
+            console.error('Error fetching match pairs:', error);
+            res.status(500).json({ error: 'Failed to fetch match pairs' });
+        }
+    }
+
     async getMatchPairs(req: Request, res: Response): Promise<void> {
         try {
             const taskId = parseInt(req.params.taskId);
@@ -72,6 +102,16 @@ class TaskController {
         }
     }
 
+    async getAllSequenceItems(req: Request, res: Response): Promise<void> {
+        try {
+            const items = await this.taskService.getAllSequenceItems();
+            res.json(items);
+        } catch (error) {
+            console.error('Error fetching sequence items:', error);
+            res.status(500).json({ error: 'Failed to fetch sequence items' });
+        }
+    }
+
     async getSequenceItems(req: Request, res: Response): Promise<void> {
         try {
             const taskId = parseInt(req.params.taskId);
@@ -80,6 +120,16 @@ class TaskController {
         } catch (error) {
             console.error('Error fetching sequence items:', error);
             res.status(500).json({ error: 'Failed to fetch sequence items' });
+        }
+    }
+
+    async getAllSortItems(req: Request, res: Response): Promise<void> {
+        try {
+            const items = await this.taskService.getAllSortItems();
+            res.json(items);
+        } catch (error) {
+            console.error('Error fetching sort items:', error);
+            res.status(500).json({ error: 'Failed to fetch sort items' });
         }
     }
 
@@ -126,7 +176,6 @@ class TaskController {
             });
 
             const createdTask = await this.taskService.getById(taskId);
-            console.log(createdTask);
             
             res.status(201).json(createdTask);
         } catch (error) {
@@ -153,8 +202,8 @@ class TaskController {
     async publish(req: Request, res: Response): Promise<void> {
         try {
             const taskId = parseInt(req.params.taskId);
-            const { published } = req.body;
-            const success = await this.taskService.publish(taskId, published);
+            const published = req.body.public_task ?? req.body.published;
+            const success = await this.taskService.publish(taskId, Boolean(published));
             if (!success) {
                 res.status(404).json({ error: 'Task not found' });
                 return;

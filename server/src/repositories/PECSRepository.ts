@@ -31,7 +31,7 @@ export default class PECSRepository {
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
-            .input('description', sql.VarChar(50), pecs.Descripti)
+            .input('description', sql.VarChar(50), pecs.Descripti || null)
             .input('filePath', sql.VarChar(250), pecs.filePath)
             .input('category', sql.VarChar(50), pecs.Category)
             .query(`
@@ -40,7 +40,7 @@ export default class PECSRepository {
                 VALUES (@description, @filePath, @category, GETDATE());
             `);
         
-        return result.recordset[0];
+        return result.recordset[0]?.PK_PECSid || 0;
     }
 
     async delete(id: number): Promise<boolean> {

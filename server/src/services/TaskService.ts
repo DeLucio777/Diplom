@@ -24,20 +24,40 @@ class TaskService {
         return await this.taskRepo.getById(id);
     }
 
+    async getAllConstructions(): Promise<TaskConstruction[]> {
+        return await this.taskItemsRepo.getAllConstructions();
+    }
+
     async getConstructionsByTaskId(taskId: number): Promise<TaskConstruction[]> {
         return await this.taskItemsRepo.getConstructionsByTaskId(taskId);
+    }
+
+    async getAllFindOddItems(): Promise<FindOddOneOutItem[]> {
+        return await this.taskItemsRepo.getAllFindOddItems();
     }
 
     async getFindOddItemsByTaskId(taskId: number): Promise<FindOddOneOutItem[]> {
         return await this.taskItemsRepo.getFindOddItemsByTaskId(taskId);
     }
 
+    async getAllMatchPairs(): Promise<MatchImageWordPair[]> {
+        return await this.taskItemsRepo.getAllMatchPairs();
+    }
+
     async getMatchPairsByTaskId(taskId: number): Promise<MatchImageWordPair[]> {
         return await this.taskItemsRepo.getMatchPairsByTaskId(taskId);
     }
 
+    async getAllSequenceItems(): Promise<SequenceItem[]> {
+        return await this.taskItemsRepo.getAllSequenceItems();
+    }
+
     async getSequenceItemsByTaskId(taskId: number): Promise<SequenceItem[]> {
         return await this.taskItemsRepo.getSequenceItemsByTaskId(taskId);
+    }
+
+    async getAllSortItems(): Promise<SortItem[]> {
+        return await this.taskItemsRepo.getAllSortItems();
     }
 
     async getSortItemsByTaskId(taskId: number): Promise<SortItem[]> {

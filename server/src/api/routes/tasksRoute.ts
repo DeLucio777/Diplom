@@ -7,10 +7,25 @@ const taskController = new TaskController();
 // GET /api/tasks
 router.get('/', (req, res) => taskController.getAll(req, res));
 
-// GET /api/tasks/:id 
+// GET /api/task-constructions
+router.get('/task-constructions', (req, res) => taskController.getAllConstructions(req, res));
+
+// GET /api/find-odd-items
+router.get('/find-odd-items', (req, res) => taskController.getAllFindOddItems(req, res));
+
+// GET /api/match-pairs
+router.get('/match-pairs', (req, res) => taskController.getAllMatchPairs(req, res));
+
+// GET /api/sequence-items
+router.get('/sequence-items', (req, res) => taskController.getAllSequenceItems(req, res));
+
+// GET /api/sort-items
+router.get('/sort-items', (req, res) => taskController.getAllSortItems(req, res));
+
+// GET /api/tasks/:id
 router.get('/:id', (req, res) => taskController.getById(req, res));
 
-// GET /api/tasks/:taskId/constructions 
+// GET /api/tasks/:taskId/constructions
 router.get('/:taskId/constructions', (req, res) => taskController.getConstructions(req, res));
 
 // GET /api/tasks/:taskId/find-odd-items 
