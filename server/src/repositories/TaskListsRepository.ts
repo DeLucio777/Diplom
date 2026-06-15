@@ -9,7 +9,7 @@ export default class TaskListsRepository {
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
-            .query('SELECT PK_id, date_complite, teacher_id FROM tbl_task_list');
+            .query('SELECT * FROM tbl_task_list');
 
         return result.recordset.map((row: any) => this.mapToTaskList(row));
     }
@@ -20,7 +20,7 @@ export default class TaskListsRepository {
 
         const result = await pool.request()
             .input('teacherId', sql.Int, teacherId)
-            .query('SELECT PK_id, date_complite, teacher_id FROM tbl_task_list WHERE teacher_id = @teacherId');
+            .query('SELECT * FROM tbl_task_list WHERE teacher_id = @teacherId');
 
         return result.recordset.map((row: any) => this.mapToTaskList(row));
     }
@@ -32,7 +32,7 @@ export default class TaskListsRepository {
         const result = await pool.request()
             .input('userId', sql.Int, userId)
             .query(`
-                SELECT DISTINCT tl.PK_id, tl.date_complite, tl.teacher_id
+                SELECT DISTINCT tl.PK_id, tl.date_complite, tl.teacher_id, tl.task_list_name, tl.task_list_description
                 FROM tbl_task_list tl
                 JOIN tbl_task_lst_to_data tld ON tld.task_list_id = tl.PK_id
                 WHERE tld.user_id = @userId
@@ -152,48 +152,61 @@ export default class TaskListsRepository {
         await transaction.begin();
 
         try {
+            console.log("STEP 1: Creating task_list...");
+
             const listResult = await transaction.request()
                 .input('dateComplete', sql.DateTime, taskList.date_complite || new Date())
                 .input('teacherId', sql.Int, taskList.teacher_id)
+                .input('task_list_name', sql.VarChar(256), taskList.Title)
+                .input('task_list_description', sql.VarChar(500), taskList.Description)
                 .query(`
-                    DECLARE @listId INT = (SELECT COALESCE(MAX(PK_id), 0) + 1 FROM tbl_task_list WITH (UPDLOCK, HOLDLOCK));
-                    DECLARE @itemId INT = (SELECT COALESCE(MAX(id), 0) + 1 FROM tbl_task_lst_to_data WITH (UPDLOCK, HOLDLOCK));
-
-                    INSERT INTO tbl_task_list (PK_id, date_complite, teacher_id)
-                    VALUES (@listId, @dateComplete, @teacherId);
-
-                    SELECT @listId AS NextListId, @itemId AS NextItemId;
+                    INSERT INTO tbl_task_list (date_complite, teacher_id, task_list_name, task_list_description)
+                        OUTPUT INSERTED.PK_id
+                    VALUES (@dateComplete, @teacherId, @task_list_name, @task_list_description);
                 `);
 
-            const newListId = listResult.recordset[0]?.NextListId;
-            let nextItemId = listResult.recordset[0]?.NextItemId;
+            const newListId = listResult.recordset[0].PK_id;
+            console.log("✔ Created task_list with ID:", newListId);
+
             let position = 1;
+
+            console.log("STEP 2: Creating task_lst_to_data entries...");
 
             for (const taskId of taskIds) {
                 for (const userId of userIds) {
+
+                    console.log(`→ Inserting pair: taskId=${taskId}, userId=${userId}, position=${position}`);
+
                     await transaction.request()
-                        .input('itemId', sql.Int, nextItemId)
                         .input('taskId', sql.Int, taskId)
                         .input('listId', sql.Int, newListId)
                         .input('position', sql.Int, position)
                         .input('userId', sql.Int, userId)
                         .query(`
-                            INSERT INTO tbl_task_lst_to_data (id, task_id, task_list_id, position, user_id, complited)
-                            VALUES (@itemId, @taskId, @listId, @position, @userId, 0);
-                        `);
+                        INSERT INTO tbl_task_lst_to_data (task_id, task_list_id, position, user_id, complited)
+                        VALUES (@taskId, @listId, @position, @userId, 0);
+                    `);
 
-                    nextItemId++;
+                    console.log(`✔ Inserted row for taskId=${taskId}, userId=${userId}`);
+
                     position++;
                 }
             }
 
+            console.log("STEP 3: Commit transaction");
             await transaction.commit();
+
+            console.log("✔ Transaction committed successfully");
             return this.getById(newListId);
+
         } catch (error) {
+            console.error("❌ ERROR OCCURRED:", error);
             await transaction.rollback();
+            console.error("↩ Transaction rolled back");
             throw error;
         }
     }
+
 
     async getById(id: number): Promise<TaskList | null> {
         const pool = getPool();
@@ -227,6 +240,8 @@ export default class TaskListsRepository {
         list.PK_id = row.PK_id;
         list.date_complite = row.date_complite;
         list.teacher_id = row.teacher_id;
+        list.Title = row.task_list_name;
+        list.Description = row.task_list_description;
         return list;
     }
 

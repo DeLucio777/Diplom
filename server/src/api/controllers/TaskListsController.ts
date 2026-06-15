@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import TaskListsService from '../../services/TaskListsService';
+import TaskList from "../../entities/taskList";
 
 class TaskListsController {
     private taskListsService: TaskListsService;
@@ -57,13 +58,17 @@ class TaskListsController {
             };
             const taskIds = Array.isArray(body.taskIds) ? body.taskIds : [];
             const userIds = Array.isArray(body.userIds) ? body.userIds : [];
-
+            const taskListr = new TaskList();
+            taskListr.Title = body.Title;
+            taskListr.Description = body.Description;
+            taskListr.date_complite = taskList.date_complite;
+            taskListr.teacher_id = taskList.teacher_id;
             if (!taskList.teacher_id) {
                 res.status(400).json({ error: 'teacher_id is required' });
                 return;
             }
 
-            const created = await this.taskListsService.create(taskList, taskIds, userIds);
+            const created = await this.taskListsService.create(taskListr, taskIds, userIds);
             if (created) {
                 res.status(201).json(created);
             } else {

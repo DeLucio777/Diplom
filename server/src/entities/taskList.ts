@@ -5,4 +5,6 @@ export default class TaskList {
     date_complite?: string;
     teacher_id: number;
     Teacher?: User;
+    Description: string;
+    Title: string;
 }
