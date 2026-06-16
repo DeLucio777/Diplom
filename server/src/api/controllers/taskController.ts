@@ -60,6 +60,65 @@ class TaskController {
         }
     }
 
+    async getConstruction(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const construction = await this.taskService.getConstructionById(id);
+            if (!construction) {
+                res.status(404).json({ error: 'Task construction not found' });
+                return;
+            }
+            res.json(construction);
+        } catch (error) {
+            console.error('Error fetching construction:', error);
+            res.status(500).json({ error: 'Failed to fetch construction' });
+        }
+    }
+
+    async createConstruction(req: Request, res: Response): Promise<void> {
+        try {
+            const construction: TaskConstruction = req.body;
+            const id = await this.taskService.createConstruction(construction);
+            const created = await this.taskService.getConstructionById(id);
+            res.status(201).json(created);
+        } catch (error) {
+            console.error('Error creating construction:', error);
+            res.status(500).json({ error: 'Failed to create construction' });
+        }
+    }
+
+    async updateConstruction(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const construction: TaskConstruction = req.body;
+            const updated = await this.taskService.updateConstruction(id, construction);
+            if (!updated) {
+                res.status(404).json({ error: 'Task construction not found' });
+                return;
+            }
+            const updatedConstruction = await this.taskService.getConstructionById(id);
+            res.json(updatedConstruction);
+        } catch (error) {
+            console.error('Error updating construction:', error);
+            res.status(500).json({ error: 'Failed to update construction' });
+        }
+    }
+
+    async deleteConstruction(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.taskService.deleteConstruction(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Task construction not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting construction:', error);
+            res.status(500).json({ error: 'Failed to delete construction' });
+        }
+    }
+
     async getAllFindOddItems(req: Request, res: Response): Promise<void> {
         try {
             const items = await this.taskService.getAllFindOddItems();
@@ -78,6 +137,65 @@ class TaskController {
         } catch (error) {
             console.error('Error fetching find odd items:', error);
             res.status(500).json({ error: 'Failed to fetch find odd items' });
+        }
+    }
+
+    async getFindOddItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const item = await this.taskService.getFindOddItemById(id);
+            if (!item) {
+                res.status(404).json({ error: 'Find odd item not found' });
+                return;
+            }
+            res.json(item);
+        } catch (error) {
+            console.error('Error fetching find odd item:', error);
+            res.status(500).json({ error: 'Failed to fetch find odd item' });
+        }
+    }
+
+    async createFindOddItem(req: Request, res: Response): Promise<void> {
+        try {
+            const item: FindOddOneOutItem = req.body;
+            const id = await this.taskService.createFindOddItem(item);
+            const created = await this.taskService.getFindOddItemById(id);
+            res.status(201).json(created);
+        } catch (error) {
+            console.error('Error creating find odd item:', error);
+            res.status(500).json({ error: 'Failed to create find odd item' });
+        }
+    }
+
+    async updateFindOddItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const item: FindOddOneOutItem = req.body;
+            const updated = await this.taskService.updateFindOddItem(id, item);
+            if (!updated) {
+                res.status(404).json({ error: 'Find odd item not found' });
+                return;
+            }
+            const updatedItem = await this.taskService.getFindOddItemById(id);
+            res.json(updatedItem);
+        } catch (error) {
+            console.error('Error updating find odd item:', error);
+            res.status(500).json({ error: 'Failed to update find odd item' });
+        }
+    }
+
+    async deleteFindOddItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.taskService.deleteFindOddItem(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Find odd item not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting find odd item:', error);
+            res.status(500).json({ error: 'Failed to delete find odd item' });
         }
     }
 
@@ -102,6 +220,65 @@ class TaskController {
         }
     }
 
+    async getMatchPair(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const pair = await this.taskService.getMatchPairById(id);
+            if (!pair) {
+                res.status(404).json({ error: 'Match pair not found' });
+                return;
+            }
+            res.json(pair);
+        } catch (error) {
+            console.error('Error fetching match pair:', error);
+            res.status(500).json({ error: 'Failed to fetch match pair' });
+        }
+    }
+
+    async createMatchPair(req: Request, res: Response): Promise<void> {
+        try {
+            const pair: MatchImageWordPair = req.body;
+            const id = await this.taskService.createMatchPair(pair);
+            const created = await this.taskService.getMatchPairById(id);
+            res.status(201).json(created);
+        } catch (error) {
+            console.error('Error creating match pair:', error);
+            res.status(500).json({ error: 'Failed to create match pair' });
+        }
+    }
+
+    async updateMatchPair(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const pair: MatchImageWordPair = req.body;
+            const updated = await this.taskService.updateMatchPair(id, pair);
+            if (!updated) {
+                res.status(404).json({ error: 'Match pair not found' });
+                return;
+            }
+            const updatedPair = await this.taskService.getMatchPairById(id);
+            res.json(updatedPair);
+        } catch (error) {
+            console.error('Error updating match pair:', error);
+            res.status(500).json({ error: 'Failed to update match pair' });
+        }
+    }
+
+    async deleteMatchPair(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.taskService.deleteMatchPair(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Match pair not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting match pair:', error);
+            res.status(500).json({ error: 'Failed to delete match pair' });
+        }
+    }
+
     async getAllSequenceItems(req: Request, res: Response): Promise<void> {
         try {
             const items = await this.taskService.getAllSequenceItems();
@@ -123,6 +300,65 @@ class TaskController {
         }
     }
 
+    async getSequenceItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const item = await this.taskService.getSequenceItemById(id);
+            if (!item) {
+                res.status(404).json({ error: 'Sequence item not found' });
+                return;
+            }
+            res.json(item);
+        } catch (error) {
+            console.error('Error fetching sequence item:', error);
+            res.status(500).json({ error: 'Failed to fetch sequence item' });
+        }
+    }
+
+    async createSequenceItem(req: Request, res: Response): Promise<void> {
+        try {
+            const item: SequenceItem = req.body;
+            const id = await this.taskService.createSequenceItem(item);
+            const created = await this.taskService.getSequenceItemById(id);
+            res.status(201).json(created);
+        } catch (error) {
+            console.error('Error creating sequence item:', error);
+            res.status(500).json({ error: 'Failed to create sequence item' });
+        }
+    }
+
+    async updateSequenceItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const item: SequenceItem = req.body;
+            const updated = await this.taskService.updateSequenceItem(id, item);
+            if (!updated) {
+                res.status(404).json({ error: 'Sequence item not found' });
+                return;
+            }
+            const updatedItem = await this.taskService.getSequenceItemById(id);
+            res.json(updatedItem);
+        } catch (error) {
+            console.error('Error updating sequence item:', error);
+            res.status(500).json({ error: 'Failed to update sequence item' });
+        }
+    }
+
+    async deleteSequenceItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.taskService.deleteSequenceItem(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Sequence item not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting sequence item:', error);
+            res.status(500).json({ error: 'Failed to delete sequence item' });
+        }
+    }
+
     async getAllSortItems(req: Request, res: Response): Promise<void> {
         try {
             const items = await this.taskService.getAllSortItems();
@@ -141,6 +377,65 @@ class TaskController {
         } catch (error) {
             console.error('Error fetching sort items:', error);
             res.status(500).json({ error: 'Failed to fetch sort items' });
+        }
+    }
+
+    async getSortItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const item = await this.taskService.getSortItemById(id);
+            if (!item) {
+                res.status(404).json({ error: 'Sort item not found' });
+                return;
+            }
+            res.json(item);
+        } catch (error) {
+            console.error('Error fetching sort item:', error);
+            res.status(500).json({ error: 'Failed to fetch sort item' });
+        }
+    }
+
+    async createSortItem(req: Request, res: Response): Promise<void> {
+        try {
+            const item: SortItem = req.body;
+            const id = await this.taskService.createSortItem(item);
+            const created = await this.taskService.getSortItemById(id);
+            res.status(201).json(created);
+        } catch (error) {
+            console.error('Error creating sort item:', error);
+            res.status(500).json({ error: 'Failed to create sort item' });
+        }
+    }
+
+    async updateSortItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const item: SortItem = req.body;
+            const updated = await this.taskService.updateSortItem(id, item);
+            if (!updated) {
+                res.status(404).json({ error: 'Sort item not found' });
+                return;
+            }
+            const updatedItem = await this.taskService.getSortItemById(id);
+            res.json(updatedItem);
+        } catch (error) {
+            console.error('Error updating sort item:', error);
+            res.status(500).json({ error: 'Failed to update sort item' });
+        }
+    }
+
+    async deleteSortItem(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.taskService.deleteSortItem(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Sort item not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting sort item:', error);
+            res.status(500).json({ error: 'Failed to delete sort item' });
         }
     }
 

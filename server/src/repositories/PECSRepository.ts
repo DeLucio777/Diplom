@@ -43,15 +43,41 @@ export default class PECSRepository {
         return result.recordset[0]?.PK_PECSid || 0;
     }
 
+    async update(id: number, pecs: CatalogPECS): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+        
+        const result = await pool.request()
+            .input('id', sql.Int, id)
+            .input('description', sql.VarChar(50), pecs.Descripti || null)
+            .input('filePath', sql.VarChar(250), pecs.filePath)
+            .input('category', sql.VarChar(50), pecs.Category)
+            .query(`
+                UPDATE tbl_CatalogPECS
+                SET Descripti = @description,
+                    filePath = @filePath,
+                    Category = @category
+                WHERE PK_PECSid = @id
+            `);
+        
+        return result.rowsAffected[0] > 0;
+    }
+
     async delete(id: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
         
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query('DELETE FROM tbl_CatalogPECS WHERE PK_PECSid = @id');
+            .query(`
+                DELETE FROM tbl_FindOddOneOutItems WHERE FK_pecsId = @id;
+                DELETE FROM tbl_MatchImageWordPairs WHERE FK_pecsId = @id;
+                DELETE FROM tbl_SequenceItems WHERE FK_pecsId = @id;
+                DELETE FROM tbl_SortItems WHERE FK_pecsId = @id;
+                DELETE FROM tbl_CatalogPECS WHERE PK_PECSid = @id;
+            `);
         
-        return result.rowsAffected[0] > 0;
+        return result.rowsAffected[result.rowsAffected.length - 1] > 0;
     }
 
     private mapToPECS(row: any): CatalogPECS {

@@ -49,6 +49,44 @@ class MediaController {
             res.status(500).json({ error: 'Failed to upload media' });
         }
     }
+
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const updated = await this.mediaService.update(id, {
+                PK_MediaId: id,
+                FileType: req.body.FileType ?? req.body.fileType,
+                FilePath: req.body.FilePath ?? req.body.filePath ?? req.body.file_path,
+                Descripti: req.body.Descripti ?? req.body.description
+            });
+
+            if (!updated) {
+                res.status(404).json({ error: 'Media not found' });
+                return;
+            }
+
+            const media = await this.mediaService.getById(id);
+            res.json(media);
+        } catch (error) {
+            console.error('Error updating media:', error);
+            res.status(500).json({ error: 'Failed to update media' });
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.mediaService.delete(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Media not found' });
+                return;
+            }
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting media:', error);
+            res.status(500).json({ error: 'Failed to delete media' });
+        }
+    }
 }
 
 export default MediaController;

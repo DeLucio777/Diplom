@@ -28,40 +28,120 @@ class TaskService {
         return await this.taskItemsRepo.getAllConstructions();
     }
 
+    async getConstructionById(id: number): Promise<TaskConstruction | null> {
+        return await this.taskItemsRepo.getConstructionById(id);
+    }
+
     async getConstructionsByTaskId(taskId: number): Promise<TaskConstruction[]> {
         return await this.taskItemsRepo.getConstructionsByTaskId(taskId);
+    }
+
+    async createConstruction(construction: TaskConstruction): Promise<number> {
+        return await this.taskItemsRepo.createConstruction(construction);
+    }
+
+    async updateConstruction(id: number, construction: TaskConstruction): Promise<boolean> {
+        return await this.taskItemsRepo.updateConstruction(id, construction);
+    }
+
+    async deleteConstruction(id: number): Promise<boolean> {
+        return await this.taskItemsRepo.deleteConstruction(id);
     }
 
     async getAllFindOddItems(): Promise<FindOddOneOutItem[]> {
         return await this.taskItemsRepo.getAllFindOddItems();
     }
 
+    async getFindOddItemById(id: number): Promise<FindOddOneOutItem | null> {
+        return await this.taskItemsRepo.getFindOddItemById(id);
+    }
+
     async getFindOddItemsByTaskId(taskId: number): Promise<FindOddOneOutItem[]> {
         return await this.taskItemsRepo.getFindOddItemsByTaskId(taskId);
+    }
+
+    async createFindOddItem(item: FindOddOneOutItem): Promise<number> {
+        return await this.taskItemsRepo.createFindOddItem(item);
+    }
+
+    async updateFindOddItem(id: number, item: FindOddOneOutItem): Promise<boolean> {
+        return await this.taskItemsRepo.updateFindOddItem(id, item);
+    }
+
+    async deleteFindOddItem(id: number): Promise<boolean> {
+        return await this.taskItemsRepo.deleteFindOddItem(id);
     }
 
     async getAllMatchPairs(): Promise<MatchImageWordPair[]> {
         return await this.taskItemsRepo.getAllMatchPairs();
     }
 
+    async getMatchPairById(id: number): Promise<MatchImageWordPair | null> {
+        return await this.taskItemsRepo.getMatchPairById(id);
+    }
+
     async getMatchPairsByTaskId(taskId: number): Promise<MatchImageWordPair[]> {
         return await this.taskItemsRepo.getMatchPairsByTaskId(taskId);
+    }
+
+    async createMatchPair(pair: MatchImageWordPair): Promise<number> {
+        return await this.taskItemsRepo.createMatchPair(pair);
+    }
+
+    async updateMatchPair(id: number, pair: MatchImageWordPair): Promise<boolean> {
+        return await this.taskItemsRepo.updateMatchPair(id, pair);
+    }
+
+    async deleteMatchPair(id: number): Promise<boolean> {
+        return await this.taskItemsRepo.deleteMatchPair(id);
     }
 
     async getAllSequenceItems(): Promise<SequenceItem[]> {
         return await this.taskItemsRepo.getAllSequenceItems();
     }
 
+    async getSequenceItemById(id: number): Promise<SequenceItem | null> {
+        return await this.taskItemsRepo.getSequenceItemById(id);
+    }
+
     async getSequenceItemsByTaskId(taskId: number): Promise<SequenceItem[]> {
         return await this.taskItemsRepo.getSequenceItemsByTaskId(taskId);
+    }
+
+    async createSequenceItem(item: SequenceItem): Promise<number> {
+        return await this.taskItemsRepo.createSequenceItem(item);
+    }
+
+    async updateSequenceItem(id: number, item: SequenceItem): Promise<boolean> {
+        return await this.taskItemsRepo.updateSequenceItem(id, item);
+    }
+
+    async deleteSequenceItem(id: number): Promise<boolean> {
+        return await this.taskItemsRepo.deleteSequenceItem(id);
     }
 
     async getAllSortItems(): Promise<SortItem[]> {
         return await this.taskItemsRepo.getAllSortItems();
     }
 
+    async getSortItemById(id: number): Promise<SortItem | null> {
+        return await this.taskItemsRepo.getSortItemById(id);
+    }
+
     async getSortItemsByTaskId(taskId: number): Promise<SortItem[]> {
         return await this.taskItemsRepo.getSortItemsByTaskId(taskId);
+    }
+
+    async createSortItem(item: SortItem): Promise<number> {
+        return await this.taskItemsRepo.createSortItem(item);
+    }
+
+    async updateSortItem(id: number, item: SortItem): Promise<boolean> {
+        return await this.taskItemsRepo.updateSortItem(id, item);
+    }
+
+    async deleteSortItem(id: number): Promise<boolean> {
+        return await this.taskItemsRepo.deleteSortItem(id);
     }
 
     async create(taskData: Task): Promise<number> {

@@ -43,6 +43,34 @@ class MediaService {
 
         return media;
     }
+
+    async update(id: number, media: MediaCatalog): Promise<boolean> {
+        return await this.mediaRepo.update(id, media);
+    }
+
+    async delete(id: number): Promise<boolean> {
+        const media = await this.mediaRepo.getById(id);
+        const deleted = await this.mediaRepo.delete(id);
+
+        if (deleted && media?.FilePath) {
+            this.deletePhysicalFile(media.FilePath);
+        }
+
+        return deleted;
+    }
+
+    private deletePhysicalFile(filePath: string): void {
+        try {
+            const normalizedPath = filePath.replace(/^\/+/, '');
+            const absolutePath = path.join(process.cwd(), normalizedPath);
+
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+            }
+        } catch (error) {
+            console.error('Error deleting media file:', error);
+        }
+    }
 }
 
 export default MediaService;

@@ -7,4 +7,6 @@ export default class TaskList {
     Teacher?: User;
     Description: string;
     Title: string;
+    FK_achievement_id?: number;
+    
 }

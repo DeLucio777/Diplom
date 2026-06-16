@@ -14,6 +14,48 @@ class AchievementsRepository {
         return result.recordset.map((row: any) => this.mapToAchievement(row));
     }
 
+    async create(achievement: Achievement): Promise<Achievement> {
+        const pool = await getConnection();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('description', sql.VarChar(255), achievement.description || null)
+            .input('name', sql.VarChar(255), achievement.name || null)
+            .input('imageId', sql.Int, achievement.image_id || null)
+            .query(`
+                INSERT INTO tbl_achievement (description, name, image_id)
+                OUTPUT INSERTED.id, INSERTED.description, INSERTED.name, INSERTED.image_id
+                VALUES (@description, @name, @imageId);
+            `);
+
+        return this.mapToAchievement(result.recordset[0]);
+    }
+
+    async update(id: number, achievement: Achievement): Promise<Achievement | null> {
+        const pool = await getConnection();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('achievementId', sql.Int, id)
+            .input('description', sql.VarChar(255), achievement.description || null)
+            .input('name', sql.VarChar(255), achievement.name || null)
+            .input('imageId', sql.Int, achievement.image_id ?? null)
+            .query(`
+                UPDATE tbl_achievement
+                SET
+                    description = COALESCE(@description, description),
+                    name = COALESCE(@name, name),
+                    image_id = COALESCE(@imageId, image_id)
+                WHERE id = @achievementId;
+
+                SELECT id, description, name, image_id
+                FROM tbl_achievement
+                WHERE id = @achievementId;
+            `);
+
+        return result.recordset[0] ? this.mapToAchievement(result.recordset[0]) : null;
+    }
+
     async getByUser(userId: number): Promise<UsersAchievement[]> {
         const pool = await getConnection();
         if (!pool) throw new Error('Database not connected');
@@ -60,10 +102,15 @@ class AchievementsRepository {
         const pool = await getConnection();
         if (!pool) throw new Error('Database not connected');
 
+        console.log("=== AWARD START ===");
+        console.log("RAW INPUT:", JSON.stringify(achievement));
+
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
 
         try {
+            console.log("CHECKING IF ALREADY EXISTS...");
+
             const existingResult = await transaction.request()
                 .input('userId', sql.Int, achievement.user_id)
                 .input('achievementId', sql.Int, achievement.achivement_id)
@@ -76,41 +123,56 @@ class AchievementsRepository {
                         a.name,
                         a.image_id
                     FROM tbl_users_achievement ua
-                    JOIN tbl_achievement a ON a.id = ua.achivement_id
+                             JOIN tbl_achievement a ON a.id = ua.achivement_id
                     WHERE ua.user_id = @userId AND ua.achivement_id = @achievementId
                 `);
 
+            console.log("EXISTING RESULT:", JSON.stringify(existingResult.recordset));
+
             if (existingResult.recordset.length > 0) {
+                console.log("ALREADY HAS ACHIEVEMENT → RETURNING EXISTING");
                 await transaction.commit();
                 return this.mapToUsersAchievement(existingResult.recordset[0]);
             }
+
+            console.log("INSERTING NEW ACHIEVEMENT...");
+            console.log("INSERT DATA:", {
+                userId: achievement.user_id,
+                achievementId: achievement.achivement_id
+            });
 
             const result = await transaction.request()
                 .input('userId', sql.Int, achievement.user_id)
                 .input('achievementId', sql.Int, achievement.achivement_id)
                 .query(`
-                    DECLARE @id INT = (SELECT COALESCE(MAX(id), 0) + 1 FROM tbl_users_achievement WITH (UPDLOCK, HOLDLOCK));
+                    INSERT INTO tbl_users_achievement (achivement_id, user_id)
+                    VALUES (@achievementId, @userId);
 
-                    INSERT INTO tbl_users_achievement (id, achivement_id, user_id)
-                    VALUES (@id, @achievementId, @userId);
-
-                    SELECT @id AS id;
+                    SELECT SCOPE_IDENTITY() AS id;
                 `);
+
+            console.log("INSERT RESULT:", JSON.stringify(result.recordset));
 
             await transaction.commit();
 
             if (result.recordset && result.recordset[0]) {
+                console.log("=== AWARD SUCCESS ===");
                 return {
                     ...achievement,
                     id: result.recordset[0].id
                 };
             }
+
+            console.log("=== AWARD FAILED: NO RESULT ===");
             return null;
+
         } catch (error) {
+            console.error("=== AWARD ERROR ===", error);
             await transaction.rollback();
             throw error;
         }
     }
+
 
     private mapToAchievement(row: any): Achievement {
         const achievement = new Achievement();

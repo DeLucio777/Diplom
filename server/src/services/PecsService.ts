@@ -43,6 +43,34 @@ class PecsService {
 
         return pecs;
     }
+
+    async update(id: number, pecs: CatalogPECS): Promise<boolean> {
+        return await this.pecsRepo.update(id, pecs);
+    }
+
+    async delete(id: number): Promise<boolean> {
+        const pecs = await this.pecsRepo.getById(id);
+        const deleted = await this.pecsRepo.delete(id);
+
+        if (deleted && pecs?.filePath) {
+            this.deletePhysicalFile(pecs.filePath);
+        }
+
+        return deleted;
+    }
+
+    private deletePhysicalFile(filePath: string): void {
+        try {
+            const normalizedPath = filePath.replace(/^\/+/, '');
+            const absolutePath = path.join(process.cwd(), normalizedPath);
+
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+            }
+        } catch (error) {
+            console.error('Error deleting PECS file:', error);
+        }
+    }
 }
 
 export default PecsService;

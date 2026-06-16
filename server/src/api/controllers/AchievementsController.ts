@@ -17,6 +17,29 @@ class AchievementsController {
         }
     }
 
+    async create(req: Request, res: Response): Promise<void> {
+        try {
+            const achievement = await this.achievementsService.create(req.body);
+            res.status(201).json(achievement);
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to create achievement' });
+        }
+    }
+
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const achievement = await this.achievementsService.update(id, req.body);
+            if (!achievement) {
+                res.status(404).json({ error: 'Achievement not found' });
+                return;
+            }
+            res.json(achievement);
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to update achievement' });
+        }
+    }
+
     async getByUser(req: Request, res: Response): Promise<void> {
         try {
             const userId = parseInt(req.params.userId);

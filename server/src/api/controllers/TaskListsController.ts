@@ -50,34 +50,42 @@ class TaskListsController {
 
     async create(req: Request, res: Response): Promise<void> {
         try {
-            const body = req.body as any;
-            console.log(body);
-            const taskList = body.taskList || {
-                teacher_id: body.teacher_id ?? body.teacherId,
-                date_complite: body.date_complite ?? body.dateComplete
-            };
+            const body = req.body;
+            console.log("RAW BODY:", JSON.stringify(body));
+
+            const taskList = new TaskList();
+
+            taskList.Title = body.Title;
+            taskList.Description = body.Description;
+            taskList.teacher_id = body.teacher_id ?? body.teacherId;
+            taskList.date_complite = body.date_complite ?? body.dateComplete;
+            taskList.FK_achievement_id = body.FK_achievement_id;
+
             const taskIds = Array.isArray(body.taskIds) ? body.taskIds : [];
             const userIds = Array.isArray(body.userIds) ? body.userIds : [];
-            const taskListr = new TaskList();
-            taskListr.Title = body.Title;
-            taskListr.Description = body.Description;
-            taskListr.date_complite = taskList.date_complite;
-            taskListr.teacher_id = taskList.teacher_id;
+
+            console.log("FINAL TASKLIST:", JSON.stringify(taskList));
+            console.log("TASK IDS:", JSON.stringify(taskIds));
+            console.log("USER IDS:", JSON.stringify(userIds));
+
             if (!taskList.teacher_id) {
-                res.status(400).json({ error: 'teacher_id is required' });
+                res.status(400).json({ error: "teacher_id is required" });
                 return;
             }
 
-            const created = await this.taskListsService.create(taskListr, taskIds, userIds);
+            const created = await this.taskListsService.create(taskList, taskIds, userIds);
+
             if (created) {
                 res.status(201).json(created);
             } else {
-                res.status(400).json({ error: 'Failed to create task list' });
+                res.status(400).json({ error: "Failed to create task list" });
             }
         } catch (error) {
-            res.status(500).json({ error: 'Failed to create task list' });
+            console.error("CREATE ERROR:", error);
+            res.status(500).json({ error: "Failed to create task list" });
         }
     }
+
 
     async delete(req: Request, res: Response): Promise<void> {
         try {

@@ -159,10 +159,11 @@ export default class TaskListsRepository {
                 .input('teacherId', sql.Int, taskList.teacher_id)
                 .input('task_list_name', sql.VarChar(256), taskList.Title)
                 .input('task_list_description', sql.VarChar(500), taskList.Description)
+                .input('FK_achievement_id', sql.Int, taskList.FK_achievement_id)
                 .query(`
-                    INSERT INTO tbl_task_list (date_complite, teacher_id, task_list_name, task_list_description)
+                    INSERT INTO tbl_task_list (date_complite, teacher_id, task_list_name, task_list_description, FK_achievement_id)
                         OUTPUT INSERTED.PK_id
-                    VALUES (@dateComplete, @teacherId, @task_list_name, @task_list_description);
+                    VALUES (@dateComplete, @teacherId, @task_list_name, @task_list_description, @FK_achievement_id);
                 `);
 
             const newListId = listResult.recordset[0].PK_id;
@@ -242,6 +243,7 @@ export default class TaskListsRepository {
         list.teacher_id = row.teacher_id;
         list.Title = row.task_list_name;
         list.Description = row.task_list_description;
+        list.FK_achievement_id = row.FK_achievement_id;
         return list;
     }
 

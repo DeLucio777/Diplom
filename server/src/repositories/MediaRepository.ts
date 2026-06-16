@@ -42,15 +42,41 @@ export default class MediaRepository {
         return result.recordset[0]?.PK_MediaId || 0;
     }
 
+    async update(id: number, media: MediaCatalog): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const result = await pool.request()
+            .input('id', sql.Int, id)
+            .input('fileType', sql.VarChar(100), media.FileType)
+            .input('filePath', sql.VarChar(250), media.FilePath)
+            .input('description', sql.VarChar(50), media.Descripti || null)
+            .query(`
+                UPDATE tbl_MediaCatalog
+                SET FileType = @fileType,
+                    FilePath = @filePath,
+                    Descripti = @description
+                WHERE PK_MediaId = @id
+            `);
+
+        return result.rowsAffected[0] > 0;
+    }
+
     async delete(id: number): Promise<boolean> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');
 
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .query('DELETE FROM tbl_MediaCatalog WHERE PK_MediaId = @id');
+            .query(`
+                DELETE FROM tbl_MatchImageWordPairs WHERE FK_MediaId = @id;
+                DELETE FROM tbl_users_achievement
+                WHERE achivement_id IN (SELECT id FROM tbl_achievement WHERE image_id = @id);
+                DELETE FROM tbl_achievement WHERE image_id = @id;
+                DELETE FROM tbl_MediaCatalog WHERE PK_MediaId = @id;
+            `);
 
-        return result.rowsAffected[0] > 0;
+        return result.rowsAffected[result.rowsAffected.length - 1] > 0;
     }
 
     private mapToMedia(row: any): MediaCatalog {

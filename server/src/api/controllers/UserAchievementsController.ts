@@ -32,7 +32,26 @@ class UserAchievementsController {
 
     async award(req: Request, res: Response): Promise<void> {
         try {
-            const achievement = req.body as UsersAchievement;
+            const body = req.body as any;
+            const userId = body?.user_id ?? body?.userId;
+            const achievementId =
+                body?.achivement_id ??
+                body?.achievementId ??
+                body?.achievement_id ??
+                body?.achievement?.id ??
+                body?.Achievement?.id;
+
+            if (!userId || !achievementId) {
+                res.status(400).json({ error: 'userId and achievementId are required' });
+                return;
+            }
+
+            const achievement = {
+                ...body,
+                user_id: userId,
+                achivement_id: achievementId
+            } as UsersAchievement;
+
             const awarded = await this.achievementsService.award(achievement);
             if (!awarded) {
                 res.status(400).json({ error: 'Failed to award achievement' });
