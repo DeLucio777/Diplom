@@ -15,6 +15,8 @@ router.get('/:groupId/members', (req, res) => groupsController.getMembers(req, r
 
 // POST /api/groups
 router.post('/', (req, res) => groupsController.create(req, res));
+router.put('/:id', (req, res) => groupsController.update(req, res));
+
 
 // DELETE /api/groups/:id
 router.delete('/:id', (req, res) => groupsController.delete(req, res));

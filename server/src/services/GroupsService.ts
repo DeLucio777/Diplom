@@ -33,7 +33,10 @@ class GroupsService {
     async delete(id: number): Promise<boolean> {
         return await this.groupsRepo.delete(id);
     }
-
+    async update(group: Group): Promise<boolean> {
+        console.log(group);
+        return await this.groupsRepo.update(group);
+    }
     async addMember(groupId: number, userId: number): Promise<ChildGroupMember | null> {
         return await this.groupsRepo.addMember(groupId, userId);
     }

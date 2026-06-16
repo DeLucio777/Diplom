@@ -116,6 +116,26 @@ export default class GroupsRepository {
         return result.rowsAffected[0] > 0;
     }
 
+    async update(group: Group): Promise<boolean> {
+        const pool = getPool();
+        if (!pool) throw new Error('Database not connected');
+
+        const request = pool.request();
+
+        const result = await request
+            .input('id', sql.Int, group.PK_Id)
+            .input('name', sql.VarChar(50), group.GroupName)
+            .query(`
+            UPDATE tbl_group
+            SET 
+                groupName = @name
+            WHERE PK_Id = @id
+        `);
+
+        return result.rowsAffected[0] > 0;
+    }
+
+
     async addMember(groupId: number, userId: number): Promise<ChildGroupMember | null> {
         const pool = getPool();
         if (!pool) throw new Error('Database not connected');

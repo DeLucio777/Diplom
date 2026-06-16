@@ -7,6 +7,25 @@ class GroupsController {
     constructor() {
         this.groupsService = new GroupsService();
     }
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const id = Number(req.params.id);
+
+            const updated = await this.groupsService.update({
+                PK_Id: id,
+                FK_Teacher_id: req.body.FK_Teacher_id,
+                GroupName: req.body.GroupName
+            });
+
+            if (updated) {
+                res.status(200).json({ success: true });
+            } else {
+                res.status(404).json({ error: 'Group not found' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to update group' });
+        }
+    }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {

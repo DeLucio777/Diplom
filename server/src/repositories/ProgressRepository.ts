@@ -17,14 +17,25 @@ export default class ProgressRepository {
                 tld.task_list_id,
                 tld.complited,
 
-                MAX(ci.complited_tasks_count)     AS complited_tasks_count,
-                MAX(ci.helpe_used_count)          AS helpe_used_count,
-                MAX(ci.miss_tasks_count)          AS miss_tasks_count,
-                MAX(ci.age)                       AS age,
-                MAX(ci.speak_level)               AS speak_level
+                -- Берём данные ИЗ tbl_childInfo через подзапрос
+                ci.complited_tasks_count,
+                ci.helpe_used_count,
+                ci.miss_tasks_count,
+                ci.age,
+                ci.speak_level
 
             FROM tbl_task_lst_to_data tld
-                     LEFT JOIN tbl_childInfo ci ON ci.FK_user_id = tld.user_id
+
+                CROSS APPLY (
+            SELECT TOP 1
+                complited_tasks_count,
+                helpe_used_count,
+                miss_tasks_count,
+                age,
+                speak_level
+            FROM tbl_childInfo
+            WHERE FK_user_id = tld.user_id
+        ) ci
         `;
 
         if (userId) {
@@ -33,19 +44,13 @@ export default class ProgressRepository {
         }
 
         query += `
-        GROUP BY
-            tld.id,
-            tld.user_id,
-            tld.task_id,
-            tld.task_list_id,
-            tld.complited
-
-        ORDER BY tld.user_id, tld.task_list_id, tld.id
+        ORDER BY tld.user_id, tld.task_list_id, tld.position
     `;
 
         const result = await request.query(query);
         return result.recordset.map((row: any) => this.mapToProgress(row));
     }
+
 
 
     private mapToProgress(row: any): ProgressRecord {
