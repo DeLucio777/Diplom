@@ -40,6 +40,20 @@ class AchievementsController {
         }
     }
 
+    async delete(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id);
+            const deleted = await this.achievementsService.delete(id);
+            if (!deleted) {
+                res.status(404).json({ error: 'Achievement not found' });
+                return;
+            }
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to delete achievement' });
+        }
+    }
+
     async getByUser(req: Request, res: Response): Promise<void> {
         try {
             const userId = parseInt(req.params.userId);

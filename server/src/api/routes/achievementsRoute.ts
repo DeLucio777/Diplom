@@ -8,6 +8,9 @@ const achievementsController = new AchievementsController();
 router.get('/', (req, res) => achievementsController.getAll(req, res));
 router.post('/', (req, res) => achievementsController.create(req, res));
 
+// DELETE /api/achievements/:id
+router.delete('/:id', (req, res) => achievementsController.delete(req, res));
+
 // PUT /api/achievements/:id
 router.put('/:id', (req, res) => achievementsController.update(req, res));
 

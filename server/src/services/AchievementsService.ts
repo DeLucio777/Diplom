@@ -21,6 +21,10 @@ class AchievementsService {
         return await this.achievementsRepo.update(id, achievement);
     }
 
+    async delete(id: number): Promise<boolean> {
+        return await this.achievementsRepo.delete(id);
+    }
+
     async getByUser(userId: number): Promise<UsersAchievement[]> {
         return await this.achievementsRepo.getByUser(userId);
     }

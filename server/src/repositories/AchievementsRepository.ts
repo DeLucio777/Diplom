@@ -56,6 +56,30 @@ class AchievementsRepository {
         return result.recordset[0] ? this.mapToAchievement(result.recordset[0]) : null;
     }
 
+    async delete(id: number): Promise<boolean> {
+        const pool = await getConnection();
+        if (!pool) throw new Error('Database not connected');
+
+        const transaction = new sql.Transaction(pool);
+        await transaction.begin();
+
+        try {
+            await transaction.request()
+                .input('achievementId', sql.Int, id)
+                .query('DELETE FROM tbl_users_achievement WHERE achivement_id = @achievementId;');
+
+            const result = await transaction.request()
+                .input('achievementId', sql.Int, id)
+                .query('DELETE FROM tbl_achievement WHERE id = @achievementId;');
+
+            await transaction.commit();
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+    }
+
     async getByUser(userId: number): Promise<UsersAchievement[]> {
         const pool = await getConnection();
         if (!pool) throw new Error('Database not connected');
