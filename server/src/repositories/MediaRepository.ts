@@ -48,13 +48,10 @@ export default class MediaRepository {
 
         const result = await pool.request()
             .input('id', sql.Int, id)
-            .input('fileType', sql.VarChar(100), media.FileType)
-            .input('filePath', sql.VarChar(250), media.FilePath)
             .input('description', sql.VarChar(50), media.Descripti || null)
             .query(`
                 UPDATE tbl_MediaCatalog
-                SET FileType = @fileType,
-                    FilePath = @filePath,
+                SET 
                     Descripti = @description
                 WHERE PK_MediaId = @id
             `);

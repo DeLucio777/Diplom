@@ -56,7 +56,7 @@ class MediaController {
             const updated = await this.mediaService.update(id, {
                 PK_MediaId: id,
                 FileType: req.body.FileType ?? req.body.fileType,
-                FilePath: req.body.FilePath ?? req.body.filePath ?? req.body.file_path,
+                FilePath: null,
                 Descripti: req.body.Descripti ?? req.body.description
             });
 

@@ -60,10 +60,15 @@ class PecsController {
     async update(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
+            console.log('updating PECS: ',  {
+                PK_PECSid: id,
+                Descripti: req.body.Descripti ?? req.body.description,
+                Category: req.body.Category ?? req.body.category
+            });
             const updated = await this.pecsService.update(id, {
                 PK_PECSid: id,
                 Descripti: req.body.Descripti ?? req.body.description,
-                filePath: req.body.filePath ?? req.body.FilePath,
+                filePath: null,
                 Category: req.body.Category ?? req.body.category
             });
 
@@ -71,7 +76,7 @@ class PecsController {
                 res.status(404).json({ error: 'PECS not found' });
                 return;
             }
-
+            
             const pecs = await this.pecsService.getById(id);
             res.json(pecs);
         } catch (error) {

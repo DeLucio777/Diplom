@@ -50,12 +50,10 @@ export default class PECSRepository {
         const result = await pool.request()
             .input('id', sql.Int, id)
             .input('description', sql.VarChar(50), pecs.Descripti || null)
-            .input('filePath', sql.VarChar(250), pecs.filePath)
             .input('category', sql.VarChar(50), pecs.Category)
             .query(`
                 UPDATE tbl_CatalogPECS
                 SET Descripti = @description,
-                    filePath = @filePath,
                     Category = @category
                 WHERE PK_PECSid = @id
             `);
